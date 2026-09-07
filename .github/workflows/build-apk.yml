@@ -13,6 +13,10 @@ on:
 permissions:
   contents: write
 
+concurrency:
+  group: kpah-apk-build
+  cancel-in-progress: true
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -65,22 +69,38 @@ jobs:
         run: |
           python3 - <<'PY'
           import base64
+          import zlib
           import zipfile
           from pathlib import Path
 
           jar = Path('runtime/app/libs/KPAH.jar')
           patch_dir = Path('patches')
           targets = {
-              'offline/fix/ArcherPoisonMonsterFix.class': 'offline__fix__ArcherPoisonMonsterFix.class.b64',
-              'offline/fix/ArcherPoisonTickSync.class': 'offline__fix__ArcherPoisonTickSync.class.b64',
-              'offline/persistence/player/MemoryPlayerStore.class': 'offline__persistence__player__MemoryPlayerStore.class.b64',
-              'offline/persistence/rms/RmsPlayerStore.class': 'offline__persistence__rms__RmsPlayerStore.class.b64',
+              'offline/fix/ArcherPoisonMonsterFix.class': ('offline__fix__ArcherPoisonMonsterFix.class.b64', False),
+              'offline/fix/ArcherPoisonTickSync.class': ('offline__fix__ArcherPoisonTickSync.class.b64', False),
+              'offline/persistence/player/MemoryPlayerStore.class': ('offline__persistence__player__MemoryPlayerStore.class.b64', True),
+              'offline/persistence/rms/RmsPlayerStore.class': ('offline__persistence__rms__RmsPlayerStore.class.b64', True),
           }
 
-          replacements = {
-              name: base64.b64decode((patch_dir / filename).read_text(encoding='ascii').strip())
-              for name, filename in targets.items()
+          replacements = {}
+          for name, (filename, compressed) in targets.items():
+              payload = base64.b64decode((patch_dir / filename).read_text(encoding='ascii').strip(), validate=True)
+              if compressed:
+                  payload = zlib.decompress(payload)
+              if not payload.startswith(b'\xca\xfe\xba\xbe'):
+                  raise SystemExit(f'Invalid class payload for {name}')
+              replacements[name] = payload
+
+          expected_sizes = {
+              'offline/fix/ArcherPoisonMonsterFix.class': 1705,
+              'offline/fix/ArcherPoisonTickSync.class': 888,
+              'offline/persistence/player/MemoryPlayerStore.class': 9394,
+              'offline/persistence/rms/RmsPlayerStore.class': 11736,
           }
+          for name, expected in expected_sizes.items():
+              actual = len(replacements[name])
+              if actual != expected:
+                  raise SystemExit(f'Patch size mismatch for {name}: {actual} != {expected}')
 
           tmp = jar.with_suffix('.patched.jar')
           replaced = set()
