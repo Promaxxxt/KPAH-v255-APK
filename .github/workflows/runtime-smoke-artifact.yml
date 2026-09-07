@@ -32,8 +32,8 @@ jobs:
       - name: Inspect exact APK
         run: |
           ls -lh exact-apk
-          APK=$(find exact-apk -type f -name '*.apk' | head -n 1)
-          unzip -l "$APK" | grep -E 'lib/(x86_64|x86|arm64-v8a|armeabi-v7a)/.*\.so' | head -n 20
+          test -f exact-apk/KPAHvip_v1.6.255_FULL_STANDALONE.apk
+          unzip -l exact-apk/KPAHvip_v1.6.255_FULL_STANDALONE.apk | grep -E 'lib/(x86_64|x86|arm64-v8a|armeabi-v7a)/.*\.so' | head -n 20
       - name: Launch exact APK on Android 34 x86_64
         uses: reactivecircus/android-emulator-runner@v2
         with:
@@ -42,13 +42,12 @@ jobs:
           profile: pixel_2
           disable-animations: true
           script: |
-            APK=$(find exact-apk -type f -name '*.apk' | head -n 1)
             echo '=== ABI ==='
             adb shell getprop ro.product.cpu.abi
             adb shell getprop ro.product.cpu.abilist
             echo '=== INSTALL ==='
-            adb install --no-streaming -r "$APK" || true
-            adb shell pm list packages | grep kpahvip || true
+            adb install --no-streaming -r exact-apk/KPAHvip_v1.6.255_FULL_STANDALONE.apk
+            adb shell pm list packages | grep kpahvip
             adb logcat -c
             echo '=== LAUNCH ==='
             adb shell am start -W -n com.example.androidlet.kpahvip.debug/javax.microedition.shell.MicroActivity || true
@@ -56,4 +55,4 @@ jobs:
             echo '=== PID ==='
             adb shell pidof com.example.androidlet.kpahvip.debug || true
             echo '=== RUNTIME ==='
-            adb logcat -d -v threadtime | grep -E -A 120 -B 25 'FATAL EXCEPTION|AndroidRuntime|kpahvip|GameMidlet|MicroActivity|MicroLoader|Init midlet failed|ClassNotFoundException|NoClassDefFoundError|UnsatisfiedLinkError' | tail -n 800 || true
+            adb logcat -d -v threadtime | grep -E -A 120 -B 25 'FATAL EXCEPTION|AndroidRuntime|kpahvip|GameMidlet|MicroActivity|MicroLoader|Init midlet failed|ClassNotFoundException|NoClassDefFoundError|UnsatisfiedLinkError|SIGSEGV|Fatal signal' | tail -n 1000 || true
