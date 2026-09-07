@@ -63,6 +63,7 @@ jobs:
       - name: Prepare KPAH standalone port
         run: |
           python3 scripts/prepare_port.py runtime "$GITHUB_WORKSPACE/KPAHtuoitho_drg.jar"
+          python3 scripts/patch_runtime_crash_dialog.py runtime
 
       - name: Apply Android-safe bytecode patches
         run: |
@@ -109,18 +110,18 @@ jobs:
       - name: Collect APK
         run: |
           mkdir -p output
-          APK=$(find runtime/app/build/outputs/apk -type f -name '*.apk' | head -n 1)
+          APK=$(find runtime/app/build/outputs/apk -type f -name '*.apk' -printf '%s %p\n' | sort -nr | head -n 1 | cut -d' ' -f2-)
           if [ -z "$APK" ]; then
             echo "APK not found"
             exit 1
           fi
-          cp "$APK" output/KPAHvip_v1.6.255_FULL_STANDALONE.apk
+          cp "$APK" output/KPAHvip_v1.6.255_K70_DEBUG.apk
           ls -lh output/
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: KPAHvip-v1.6.255-FULL-STANDALONE
-          path: output/KPAHvip_v1.6.255_FULL_STANDALONE.apk
+          name: KPAHvip-v1.6.255-K70-DEBUG
+          path: output/KPAHvip_v1.6.255_K70_DEBUG.apk
           if-no-files-found: error
           retention-days: 30
