@@ -1,0 +1,85 @@
+name: Build KPAH Standalone APK
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+    paths:
+      - 'KPAHtuoitho_drg.jar'
+      - 'scripts/**'
+      - '.github/workflows/build-apk.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    steps:
+      - name: Checkout KPAH project
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install Android components
+        run: |
+          yes | sdkmanager --licenses >/dev/null || true
+          sdkmanager "platforms;android-34" "build-tools;34.0.0" "ndk;22.1.7171670"
+
+      - name: Clone standalone runtime
+        run: |
+          git clone https://github.com/nikita36078/J2ME-Loader.git runtime
+          cd runtime
+          git checkout 9b0fa48a0a0d1e61376c0b9af28b3d2caec0a4cc
+
+      - name: Generate local signing config
+        run: |
+          keytool -genkeypair -v \
+            -keystore runtime/kpah-build.keystore \
+            -storepass android -keypass android \
+            -alias kpah -keyalg RSA -keysize 2048 -validity 10000 \
+            -dname "CN=KPAHvip,O=KPAH,C=VN"
+          cat > runtime/keystore.properties <<'EOF'
+          storeFile=kpah-build.keystore
+          storePassword=android
+          keyAlias=kpah
+          keyPassword=android
+          EOF
+
+      - name: Prepare KPAH standalone port
+        run: |
+          python3 scripts/prepare_port.py runtime "$GITHUB_WORKSPACE/KPAHtuoitho_drg.jar"
+
+      - name: Build standalone APK
+        working-directory: runtime
+        run: |
+          chmod +x gradlew
+          ./gradlew :app:assembleMidletDebug --stacktrace --no-daemon
+
+      - name: Collect APK
+        run: |
+          mkdir -p output
+          APK=$(find runtime/app/build/outputs/apk -type f -name '*.apk' | head -n 1)
+          if [ -z "$APK" ]; then
+            echo "APK not found"
+            exit 1
+          fi
+          cp "$APK" output/KPAHvip_v1.6.255_FULL_STANDALONE.apk
+          ls -lh output/
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: KPAHvip-v1.6.255-FULL-STANDALONE
+          path: output/KPAHvip_v1.6.255_FULL_STANDALONE.apk
+          if-no-files-found: error
+          retention-days: 30
