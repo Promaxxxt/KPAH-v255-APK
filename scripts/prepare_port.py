@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# KPAH standalone port builder - touch UI + direct Android launch.
 import os
 import re
 import shutil
