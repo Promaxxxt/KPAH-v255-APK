@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 import argparse
 import base64
-import shutil
 import zlib
 import zipfile
 from pathlib import Path
@@ -9,6 +8,7 @@ from pathlib import Path
 PATCHES = {
     "offline/fix/ArcherPoisonMonsterFix.class": ("offline__fix__ArcherPoisonMonsterFix.class.b64", False, 1705),
     "offline/fix/ArcherPoisonTickSync.class": ("offline__fix__ArcherPoisonTickSync.class.b64", False, 888),
+    "offline/fix/FashionCharListFix.class": ("offline__fix__FashionCharListFix.class.b64", False, 2905),
     "offline/persistence/player/MemoryPlayerStore.class": ("offline__persistence__player__MemoryPlayerStore.class.b64", True, 9394),
     "offline/persistence/rms/RmsPlayerStore.class": ("offline__persistence__rms__RmsPlayerStore.class.b64", True, 11736),
 }
