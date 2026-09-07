@@ -1,0 +1,500 @@
+C/C++: #   define M3G_LOG1(level, msg, a)          ((void)(level), (void)(msg), (void)(a))
+C/C++:                                                                                 ^
+C/C++: In file included from /home/runner/work/KPAH-v255-APK/KPAH-v255-APK/runtime/app/src/main/cpp/m3g/src/m3g_core.c:100:
+C/C++: /home/runner/work/KPAH-v255-APK/KPAH-v255-APK/runtime/app/src/main/cpp/m3g/src/m3g_interface.c:1704:53: warning: cast to smaller integer type 'unsigned int' from 'Interface *' (aka 'struct M3GInterfaceImpl *') [-Wpointer-to-int-cast]
+C/C++:              "Shutting down interface 0x%08X...\n", (unsigned) m3g);
+C/C++:                                                     ^~~~~~~~~~~~~~
+C/C++: /home/runner/work/KPAH-v255-APK/KPAH-v255-APK/runtime/app/src/main/cpp/m3g/inc/m3g_defs.h:625:81: note: expanded from macro 'M3G_LOG1'
+C/C++: #   define M3G_LOG1(level, msg, a)          ((void)(level), (void)(msg), (void)(a))
+C/C++:                                                                                 ^
+C/C++: In file included from /home/runner/work/KPAH-v255-APK/KPAH-v255-APK/runtime/app/src/main/cpp/m3g/src/m3g_core.c:100:
+C/C++: /home/runner/work/KPAH-v255-APK/KPAH-v255-APK/runtime/app/src/main/cpp/m3g/src/m3g_interface.c:1764:46: warning: cast to smaller integer type 'unsigned int' from 'Interface *' (aka 'struct M3GInterfaceImpl *') [-Wpointer-to-int-cast]
+C/C++:              "Interface 0x%08X destroyed\n", (unsigned) m3g);
+C/C++:                                              ^~~~~~~~~~~~~~
+C/C++: /home/runner/work/KPAH-v255-APK/KPAH-v255-APK/runtime/app/src/main/cpp/m3g/inc/m3g_defs.h:625:81: note: expanded from macro 'M3G_LOG1'
+C/C++: #   define M3G_LOG1(level, msg, a)          ((void)(level), (void)(msg), (void)(a))
+C/C++:                                                                                 ^
+C/C++: In file included from /home/runner/work/KPAH-v255-APK/KPAH-v255-APK/runtime/app/src/main/cpp/m3g/src/m3g_core.c:110:
+C/C++: /home/runner/work/KPAH-v255-APK/KPAH-v255-APK/runtime/app/src/main/cpp/m3g/src/m3g_mesh.c:82:34: warning: comparison between pointer and integer ('M3Gulong' (aka 'unsigned long') and 'void *') [-Wpointer-integer-compare]
+C/C++:         if (mesh->appearances[i] != NULL) {
+C/C++:             ~~~~~~~~~~~~~~~~~~~~ ^  ~~~~
+C/C++: /home/runner/work/KPAH-v255-APK/KPAH-v255-APK/runtime/app/src/main/cpp/m3g/src/m3g_mesh.c:260:34: warning: comparison between pointer and integer ('M3Gulong' (aka 'unsigned long') and 'void *') [-Wpointer-integer-compare]
+C/C++:         if (mesh->appearances[i] == NULL ||
+C/C++:             ~~~~~~~~~~~~~~~~~~~~ ^  ~~~~
+C/C++: /home/runner/work/KPAH-v255-APK/KPAH-v255-APK/runtime/app/src/main/cpp/m3g/src/m3g_mesh.c:261:35: warning: comparison between pointer and integer ('M3Gulong' (aka 'unsigned long') and 'void *') [-Wpointer-integer-compare]
+C/C++:             mesh->indexBuffers[i] == NULL) continue;
+C/C++:             ~~~~~~~~~~~~~~~~~~~~~ ^  ~~~~
+C/C++: /home/runner/work/KPAH-v255-APK/KPAH-v255-APK/runtime/app/src/main/cpp/m3g/src/m3g_mesh.c:430:21: warning: comparison between pointer and integer ('M3Gulong' (aka 'unsigned long') and 'void *') [-Wpointer-integer-compare]
+C/C++:                 if (hTriangles[i] == NULL) {
+C/C++:                     ~~~~~~~~~~~~~ ^  ~~~~
+C/C++: /home/runner/work/KPAH-v255-APK/KPAH-v255-APK/runtime/app/src/main/cpp/m3g/src/m3g_mesh.c:491:35: warning: comparison between pointer and integer ('M3Gulong' (aka 'unsigned long') and 'void *') [-Wpointer-integer-compare]
+C/C++:         if (mesh->indexBuffers[i] != NULL) {
+C/C++:             ~~~~~~~~~~~~~~~~~~~~~ ^  ~~~~
+C/C++: /home/runner/work/KPAH-v255-APK/KPAH-v255-APK/runtime/app/src/main/cpp/m3g/src/m3g_mesh.c:496:34: warning: comparison between pointer and integer ('M3Gulong' (aka 'unsigned long') and 'void *') [-Wpointer-integer-compare]
+C/C++:         if (mesh->appearances[i] != NULL) {
+C/C++:             ~~~~~~~~~~~~~~~~~~~~ ^  ~~~~
+C/C++: /home/runner/work/KPAH-v255-APK/KPAH-v255-APK/runtime/app/src/main/cpp/m3g/src/m3g_mesh.c:519:35: warning: comparison between pointer and integer ('M3Gulong' (aka 'unsigned long') and 'void *') [-Wpointer-integer-compare]
+C/C++:         if (mesh->indexBuffers[i] != NULL) {
+C/C++:             ~~~~~~~~~~~~~~~~~~~~~ ^  ~~~~
+C/C++: /home/runner/work/KPAH-v255-APK/KPAH-v255-APK/runtime/app/src/main/cpp/m3g/src/m3g_mesh.c:522:44: warning: comparison between pointer and integer ('M3Gulong' (aka 'unsigned long') and 'void *') [-Wpointer-integer-compare]
+C/C++:         if (!found && mesh->appearances[i] != NULL) {
+C/C++:                       ~~~~~~~~~~~~~~~~~~~~ ^  ~~~~
+C/C++: In file included from /home/runner/work/KPAH-v255-APK/KPAH-v255-APK/runtime/app/src/main/cpp/m3g/src/m3g_core.c:111:
+C/C++: /home/runner/work/KPAH-v255-APK/KPAH-v255-APK/runtime/app/src/main/cpp/m3g/src/m3g_morphingmesh.c:904:31: warning: comparison between pointer and integer ('M3Gulong' (aka 'unsigned long') and 'void *') [-Wpointer-integer-compare]
+C/C++:         if (mmesh->targets[i] != NULL) {
+C/C++:             ~~~~~~~~~~~~~~~~~ ^  ~~~~
+C/C++: /home/runner/work/KPAH-v255-APK/KPAH-v255-APK/runtime/app/src/main/cpp/m3g/src/m3g_morphingmesh.c:924:31: warning: comparison between pointer and integer ('M3Gulong' (aka 'unsigned long') and 'void *') [-Wpointer-integer-compare]
+C/C++:         if (mmesh->targets[i] != NULL) {
+C/C++:             ~~~~~~~~~~~~~~~~~ ^  ~~~~
+C/C++: /home/runner/work/KPAH-v255-APK/KPAH-v255-APK/runtime/app/src/main/cpp/m3g/src/m3g_morphingmesh.c:1037:25: warning: comparison between pointer and integer ('M3Gulong' (aka 'unsigned long') and 'void *') [-Wpointer-integer-compare]
+C/C++:         if (hTargets[i] == NULL) {
+C/C++:             ~~~~~~~~~~~ ^  ~~~~
+C/C++: In file included from /home/runner/work/KPAH-v255-APK/KPAH-v255-APK/runtime/app/src/main/cpp/m3g/src/m3g_core.c:113:
+C/C++: /home/runner/work/KPAH-v255-APK/KPAH-v255-APK/runtime/app/src/main/cpp/m3g/src/m3g_object.c:65:14: warning: cast to smaller integer type 'unsigned int' from 'Object *' (aka 'struct M3GObjectImpl *') [-Wpointer-to-int-cast]
+C/C++:              (unsigned) obj);
+C/C++:              ^~~~~~~~~~~~~~
+C/C++: /home/runner/work/KPAH-v255-APK/KPAH-v255-APK/runtime/app/src/main/cpp/m3g/inc/m3g_defs.h:626:92: note: expanded from macro 'M3G_LOG2'
+C/C++: #   define M3G_LOG2(level, msg, a, b)       ((void)(level), (void)(msg), (void)(a), (void)(b))
+C/C++:                                                                                            ^
+C/C++: In file included from /home/runner/work/KPAH-v255-APK/KPAH-v255-APK/runtime/app/src/main/cpp/m3g/src/m3g_core.c:113:
+C/C++: /home/runner/work/KPAH-v255-APK/KPAH-v255-APK/runtime/app/src/main/cpp/m3g/src/m3g_object.c:95:14: warning: cast to smaller integer type 'unsigned int' from 'Object *' (aka 'struct M3GObjectImpl *') [-Wpointer-to-int-cast]
+C/C++:              (unsigned) obj);
+C/C++:              ^~~~~~~~~~~~~~
+C/C++: /home/runner/work/KPAH-v255-APK/KPAH-v255-APK/runtime/app/src/main/cpp/m3g/inc/m3g_defs.h:626:92: note: expanded from macro 'M3G_LOG2'
+C/C++: #   define M3G_LOG2(level, msg, a, b)       ((void)(level), (void)(msg), (void)(a), (void)(b))
+C/C++:                                                                                            ^
+C/C++: In file included from /home/runner/work/KPAH-v255-APK/KPAH-v255-APK/runtime/app/src/main/cpp/m3g/src/m3g_core.c:113:
+C/C++: /home/runner/work/KPAH-v255-APK/KPAH-v255-APK/runtime/app/src/main/cpp/m3g/src/m3g_object.c:464:22: warning: cast to smaller integer type 'unsigned int' from 'Object *' (aka 'struct M3GObjectImpl *') [-Wpointer-to-int-cast]
+C/C++:                      (unsigned) obj);
+C/C++:                      ^~~~~~~~~~~~~~
+C/C++: /home/runner/work/KPAH-v255-APK/KPAH-v255-APK/runtime/app/src/main/cpp/m3g/inc/m3g_defs.h:626:92: note: expanded from macro 'M3G_LOG2'
+C/C++: #   define M3G_LOG2(level, msg, a, b)       ((void)(level), (void)(msg), (void)(a), (void)(b))
+C/C++:                                                                                            ^
+C/C++: In file included from /home/runner/work/KPAH-v255-APK/KPAH-v255-APK/runtime/app/src/main/cpp/m3g/src/m3g_core.c:113:
+C/C++: /home/runner/work/KPAH-v255-APK/KPAH-v255-APK/runtime/app/src/main/cpp/m3g/src/m3g_object.c:489:14: warning: cast to smaller integer type 'unsigned int' from 'Object *' (aka 'struct M3GObjectImpl *') [-Wpointer-to-int-cast]
+C/C++:              (unsigned) obj,
+C/C++:              ^~~~~~~~~~~~~~
+C/C++: /home/runner/work/KPAH-v255-APK/KPAH-v255-APK/runtime/app/src/main/cpp/m3g/inc/m3g_defs.h:627:81: note: expanded from macro 'M3G_LOG3'
+C/C++: #   define M3G_LOG3(level, msg, a, b, c)    ((void)(level), (void)(msg), (void)(a), (void)(b), (void)(c))
+C/C++:                                                                                 ^
+C/C++: In file included from /home/runner/work/KPAH-v255-APK/KPAH-v255-APK/runtime/app/src/main/cpp/m3g/src/m3g_core.c:113:
+C/C++: /home/runner/work/KPAH-v255-APK/KPAH-v255-APK/runtime/app/src/main/cpp/m3g/src/m3g_object.c:512:14: warning: cast to smaller integer type 'unsigned int' from 'Object *' (aka 'struct M3GObjectImpl *') [-Wpointer-to-int-cast]
+C/C++:              (unsigned) obj,
+C/C++:              ^~~~~~~~~~~~~~
+C/C++: /home/runner/work/KPAH-v255-APK/KPAH-v255-APK/runtime/app/src/main/cpp/m3g/inc/m3g_defs.h:627:81: note: expanded from macro 'M3G_LOG3'
+C/C++: #   define M3G_LOG3(level, msg, a, b, c)    ((void)(level), (void)(msg), (void)(a), (void)(b), (void)(c))
+C/C++:                                                                                 ^
+C/C++: In file included from /home/runner/work/KPAH-v255-APK/KPAH-v255-APK/runtime/app/src/main/cpp/m3g/src/m3g_core.c:113:
+C/C++: /home/runner/work/KPAH-v255-APK/KPAH-v255-APK/runtime/app/src/main/cpp/m3g/src/m3g_object.c:668:53: warning: cast to smaller integer type 'unsigned int' from 'Object *' (aka 'struct M3GObjectImpl *') [-Wpointer-to-int-cast]
+C/C++:              m3gClassName((M3GClass) obj->classID), (unsigned) obj);
+C/C++:                                                     ^~~~~~~~~~~~~~
+C/C++: /home/runner/work/KPAH-v255-APK/KPAH-v255-APK/runtime/app/src/main/cpp/m3g/inc/m3g_defs.h:626:92: note: expanded from macro 'M3G_LOG2'
+C/C++: #   define M3G_LOG2(level, msg, a, b)       ((void)(level), (void)(msg), (void)(a), (void)(b))
+C/C++:                                                                                            ^
+C/C++: In file included from /home/runner/work/KPAH-v255-APK/KPAH-v255-APK/runtime/app/src/main/cpp/m3g/src/m3g_core.c:113:
+C/C++: /home/runner/work/KPAH-v255-APK/KPAH-v255-APK/runtime/app/src/main/cpp/m3g/src/m3g_object.c:712:53: warning: cast to smaller integer type 'unsigned int' from 'const Object *' (aka 'const struct M3GObjectImpl *') [-Wpointer-to-int-cast]
+C/C++:              m3gClassName((M3GClass) obj->classID), (unsigned) obj);
+C/C++:                                                     ^~~~~~~~~~~~~~
+C/C++: /home/runner/work/KPAH-v255-APK/KPAH-v255-APK/runtime/app/src/main/cpp/m3g/inc/m3g_defs.h:626:92: note: expanded from macro 'M3G_LOG2'
+C/C++: #   define M3G_LOG2(level, msg, a, b)       ((void)(level), (void)(msg), (void)(a), (void)(b))
+C/C++:                                                                                            ^
+C/C++: In file included from /home/runner/work/KPAH-v255-APK/KPAH-v255-APK/runtime/app/src/main/cpp/m3g/src/m3g_core.c:113:
+C/C++: /home/runner/work/KPAH-v255-APK/KPAH-v255-APK/runtime/app/src/main/cpp/m3g/src/m3g_object.c:767:41: warning: cast to smaller integer type 'unsigned int' from 'Object *' (aka 'struct M3GObjectImpl *') [-Wpointer-to-int-cast]
+C/C++:              (unsigned) userID, userID, (unsigned) obj);
+C/C++:                                         ^~~~~~~~~~~~~~
+C/C++: /home/runner/work/KPAH-v255-APK/KPAH-v255-APK/runtime/app/src/main/cpp/m3g/inc/m3g_defs.h:627:103: note: expanded from macro 'M3G_LOG3'
+C/C++: #   define M3G_LOG3(level, msg, a, b, c)    ((void)(level), (void)(msg), (void)(a), (void)(b), (void)(c))
+C/C++:                                                                                                       ^
+C/C++: In file included from /home/runner/work/KPAH-v255-APK/KPAH-v255-APK/runtime/app/src/main/cpp/m3g/src/m3g_core.c:116:
+C/C++: /home/runner/work/KPAH-v255-APK/KPAH-v255-APK/runtime/app/src/main/cpp/m3g/src/m3g_skinnedmesh.c:1625:55: warning: shifting a negative signed value is undefined [-Wshift-negative-value]
+C/C++:                 mesh->bbox.min[i] = m3gMadd(scale, -1 << 15, bias[i]);
+C/C++:                                                    ~~ ^
+C/C++: /home/runner/work/KPAH-v255-APK/KPAH-v255-APK/runtime/app/src/main/cpp/m3g/inc/m3g_math.h:154:55: note: expanded from macro 'm3gMadd'
+C/C++: #   define m3gMadd(a, b, c)     ((float)(a) * (float)(b) + (float)(c))
+C/C++:                                                       ^
+C/C++: In file included from /home/runner/work/KPAH-v255-APK/KPAH-v255-APK/runtime/app/src/main/cpp/m3g/src/m3g_core.c:118:
+C/C++: /home/runner/work/KPAH-v255-APK/KPAH-v255-APK/runtime/app/src/main/cpp/m3g/src/m3g_tcache.c:76:17: warning: cast to smaller integer type 'M3Guint' (aka 'unsigned int') from 'const Transformable *' (aka 'const struct M3GTransformableImpl *') [-Wpointer-to-int-cast]
+C/C++:     M3Guint a = (M3Guint) t;
+C/C++:                 ^~~~~~~~~~~
+C/C++: /home/runner/work/KPAH-v255-APK/KPAH-v255-APK/runtime/app/src/main/cpp/m3g/src/m3g_tcache.c:77:17: warning: cast to smaller integer type 'M3Guint' (aka 'unsigned int') from 'const Transformable *' (aka 'const struct M3GTransformableImpl *') [-Wpointer-to-int-cast]
+C/C++:     M3Guint b = (M3Guint) t;
+C/C++:                 ^~~~~~~~~~~
+C/C++: /home/runner/work/KPAH-v255-APK/KPAH-v255-APK/runtime/app/src/main/cpp/m3g/src/m3g_tcache.c:87:17: warning: cast to smaller integer type 'M3Guint' (aka 'unsigned int') from 'const Node *' (aka 'const struct M3GNodeImpl *') [-Wpointer-to-int-cast]
+C/C++:     M3Guint a = (M3Guint) from;
+C/C++:                 ^~~~~~~~~~~~~~
+C/C++: /home/runner/work/KPAH-v255-APK/KPAH-v255-APK/runtime/app/src/main/cpp/m3g/src/m3g_tcache.c:88:17: warning: cast to smaller integer type 'M3Guint' (aka 'unsigned int') from 'const Node *' (aka 'const struct M3GNodeImpl *') [-Wpointer-to-int-cast]
+C/C++:     M3Guint b = (M3Guint) to;
+C/C++:                 ^~~~~~~~~~~~
+C/C++: In file included from /home/runner/work/KPAH-v255-APK/KPAH-v255-APK/runtime/app/src/main/cpp/m3g/src/m3g_core.c:121:
+C/C++: /home/runner/work/KPAH-v255-APK/KPAH-v255-APK/runtime/app/src/main/cpp/m3g/src/m3g_vertexarray.c:644:17: warning: 5 enumeration values not handled in switch: 'M3G_UBYTE', 'M3G_USHORT', 'M3G_INT'... [-Wswitch]
+C/C++:         switch (type) {
+C/C++:                 ^
+
+> Task :app:desugarMidletDebugFileDependencies FAILED
+ERROR: /home/runner/work/KPAH-v255-APK/KPAH-v255-APK/runtime/app/libs/KPAH.jar: D8: com.android.tools.r8.internal.Ke: Undefined value encountered during compilation. This is typically caused by invalid dex input that uses a register that is not defined on all control-flow paths leading to the use.
+
+> Task :app:buildNdkBuildDebug[x86_64]
+C/C++: 63 warnings generated.
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':app:desugarMidletDebugFileDependencies'.
+> A failure occurred while executing com.android.build.gradle.internal.tasks.DexFileDependenciesTask$DexFileDependenciesWorkerAction
+   > Error while dexing.
+
+* Try:
+> Run with --info or --debug option to get more log output.
+> Run with --scan to get full insights.
+> Get more help at https://help.gradle.org.
+
+* Exception is:
+org.gradle.api.tasks.TaskExecutionException: Execution failed for task ':app:desugarMidletDebugFileDependencies'.
+	at org.gradle.api.internal.tasks.execution.ExecuteActionsTaskExecuter.lambda$executeIfValid$1(ExecuteActionsTaskExecuter.java:130)
+	at org.gradle.internal.Try$Failure.ifSuccessfulOrElse(Try.java:282)
+	at org.gradle.api.internal.tasks.execution.ExecuteActionsTaskExecuter.executeIfValid(ExecuteActionsTaskExecuter.java:128)
+	at org.gradle.api.internal.tasks.execution.ExecuteActionsTaskExecuter.execute(ExecuteActionsTaskExecuter.java:116)
+	at org.gradle.api.internal.tasks.execution.FinalizePropertiesTaskExecuter.execute(FinalizePropertiesTaskExecuter.java:46)
+	at org.gradle.api.internal.tasks.execution.ResolveTaskExecutionModeExecuter.execute(ResolveTaskExecutionModeExecuter.java:51)
+	at org.gradle.api.internal.tasks.execution.SkipTaskWithNoActionsExecuter.execute(SkipTaskWithNoActionsExecuter.java:57)
+	at org.gradle.api.internal.tasks.execution.SkipOnlyIfTaskExecuter.execute(SkipOnlyIfTaskExecuter.java:74)
+	at org.gradle.api.internal.tasks.execution.CatchExceptionTaskExecuter.execute(CatchExceptionTaskExecuter.java:36)
+	at org.gradle.api.internal.tasks.execution.EventFiringTaskExecuter$1.executeTask(EventFiringTaskExecuter.java:77)
+	at org.gradle.api.internal.tasks.execution.EventFiringTaskExecuter$1.call(EventFiringTaskExecuter.java:55)
+	at org.gradle.api.internal.tasks.execution.EventFiringTaskExecuter$1.call(EventFiringTaskExecuter.java:52)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:200)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:195)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:66)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:59)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:157)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:59)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.call(DefaultBuildOperationRunner.java:53)
+	at org.gradle.internal.operations.DefaultBuildOperationExecutor.call(DefaultBuildOperationExecutor.java:73)
+	at org.gradle.api.internal.tasks.execution.EventFiringTaskExecuter.execute(EventFiringTaskExecuter.java:52)
+	at org.gradle.execution.plan.LocalTaskNodeExecutor.execute(LocalTaskNodeExecutor.java:42)
+	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$InvokeNodeExecutorsAction.execute(DefaultTaskExecutionGraph.java:331)
+	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$InvokeNodeExecutorsAction.execute(DefaultTaskExecutionGraph.java:318)
+	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$BuildOperationAwareExecutionAction.lambda$execute$0(DefaultTaskExecutionGraph.java:314)
+	at org.gradle.internal.operations.CurrentBuildOperationRef.with(CurrentBuildOperationRef.java:80)
+	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$BuildOperationAwareExecutionAction.execute(DefaultTaskExecutionGraph.java:314)
+	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$BuildOperationAwareExecutionAction.execute(DefaultTaskExecutionGraph.java:303)
+	at org.gradle.execution.plan.DefaultPlanExecutor$ExecutorWorker.execute(DefaultPlanExecutor.java:463)
+	at org.gradle.execution.plan.DefaultPlanExecutor$ExecutorWorker.run(DefaultPlanExecutor.java:380)
+	at org.gradle.internal.concurrent.ExecutorPolicy$CatchAndRecordFailures.onExecute(ExecutorPolicy.java:64)
+	at org.gradle.internal.concurrent.AbstractManagedExecutor$1.run(AbstractManagedExecutor.java:47)
+Caused by: org.gradle.workers.internal.DefaultWorkerExecutor$WorkExecutionException: A failure occurred while executing com.android.build.gradle.internal.tasks.DexFileDependenciesTask$DexFileDependenciesWorkerAction
+	at org.gradle.workers.internal.DefaultWorkerExecutor$WorkItemExecution.waitForCompletion(DefaultWorkerExecutor.java:287)
+	at org.gradle.internal.work.DefaultAsyncWorkTracker.lambda$waitForItemsAndGatherFailures$2(DefaultAsyncWorkTracker.java:130)
+	at org.gradle.internal.Factories$1.create(Factories.java:31)
+	at org.gradle.internal.work.DefaultWorkerLeaseService.withoutLocks(DefaultWorkerLeaseService.java:336)
+	at org.gradle.internal.work.DefaultWorkerLeaseService.withoutLocks(DefaultWorkerLeaseService.java:319)
+	at org.gradle.internal.work.DefaultWorkerLeaseService.withoutLock(DefaultWorkerLeaseService.java:324)
+	at org.gradle.internal.work.DefaultAsyncWorkTracker.waitForItemsAndGatherFailures(DefaultAsyncWorkTracker.java:126)
+	at org.gradle.internal.work.DefaultAsyncWorkTracker.waitForItemsAndGatherFailures(DefaultAsyncWorkTracker.java:92)
+	at org.gradle.internal.work.DefaultAsyncWorkTracker.waitForAll(DefaultAsyncWorkTracker.java:78)
+	at org.gradle.internal.work.DefaultAsyncWorkTracker.waitForCompletion(DefaultAsyncWorkTracker.java:66)
+	at org.gradle.api.internal.tasks.execution.TaskExecution$3.run(TaskExecution.java:252)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$1.execute(DefaultBuildOperationRunner.java:29)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$1.execute(DefaultBuildOperationRunner.java:26)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:66)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:59)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:157)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:59)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.run(DefaultBuildOperationRunner.java:47)
+	at org.gradle.internal.operations.DefaultBuildOperationExecutor.run(DefaultBuildOperationExecutor.java:68)
+	at org.gradle.api.internal.tasks.execution.TaskExecution.executeAction(TaskExecution.java:229)
+	at org.gradle.api.internal.tasks.execution.TaskExecution.executeActions(TaskExecution.java:212)
+	at org.gradle.api.internal.tasks.execution.TaskExecution.executeWithPreviousOutputFiles(TaskExecution.java:195)
+	at org.gradle.api.internal.tasks.execution.TaskExecution.execute(TaskExecution.java:162)
+	at org.gradle.internal.execution.steps.ExecuteStep.executeInternal(ExecuteStep.java:105)
+	at org.gradle.internal.execution.steps.ExecuteStep.access$000(ExecuteStep.java:44)
+	at org.gradle.internal.execution.steps.ExecuteStep$1.call(ExecuteStep.java:59)
+	at org.gradle.internal.execution.steps.ExecuteStep$1.call(ExecuteStep.java:56)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:200)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:195)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:66)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:59)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:157)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:59)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.call(DefaultBuildOperationRunner.java:53)
+	at org.gradle.internal.operations.DefaultBuildOperationExecutor.call(DefaultBuildOperationExecutor.java:73)
+	at org.gradle.internal.execution.steps.ExecuteStep.execute(ExecuteStep.java:56)
+	at org.gradle.internal.execution.steps.ExecuteStep.execute(ExecuteStep.java:44)
+	at org.gradle.internal.execution.steps.CancelExecutionStep.execute(CancelExecutionStep.java:41)
+	at org.gradle.internal.execution.steps.TimeoutStep.executeWithoutTimeout(TimeoutStep.java:74)
+	at org.gradle.internal.execution.steps.TimeoutStep.execute(TimeoutStep.java:55)
+	at org.gradle.internal.execution.steps.PreCreateOutputParentsStep.execute(PreCreateOutputParentsStep.java:50)
+	at org.gradle.internal.execution.steps.PreCreateOutputParentsStep.execute(PreCreateOutputParentsStep.java:28)
+	at org.gradle.internal.execution.steps.RemovePreviousOutputsStep.execute(RemovePreviousOutputsStep.java:67)
+	at org.gradle.internal.execution.steps.RemovePreviousOutputsStep.execute(RemovePreviousOutputsStep.java:37)
+	at org.gradle.internal.execution.steps.BroadcastChangingOutputsStep.execute(BroadcastChangingOutputsStep.java:61)
+	at org.gradle.internal.execution.steps.BroadcastChangingOutputsStep.execute(BroadcastChangingOutputsStep.java:26)
+	at org.gradle.internal.execution.steps.CaptureOutputsAfterExecutionStep.execute(CaptureOutputsAfterExecutionStep.java:67)
+	at org.gradle.internal.execution.steps.CaptureOutputsAfterExecutionStep.execute(CaptureOutputsAfterExecutionStep.java:45)
+	at org.gradle.internal.execution.steps.ResolveInputChangesStep.execute(ResolveInputChangesStep.java:40)
+	at org.gradle.internal.execution.steps.ResolveInputChangesStep.execute(ResolveInputChangesStep.java:29)
+	at org.gradle.internal.execution.steps.BuildCacheStep.executeWithoutCache(BuildCacheStep.java:189)
+	at org.gradle.internal.execution.steps.BuildCacheStep.lambda$execute$1(BuildCacheStep.java:75)
+	at org.gradle.internal.Either$Right.fold(Either.java:175)
+	at org.gradle.internal.execution.caching.CachingState.fold(CachingState.java:62)
+	at org.gradle.internal.execution.steps.BuildCacheStep.execute(BuildCacheStep.java:73)
+	at org.gradle.internal.execution.steps.BuildCacheStep.execute(BuildCacheStep.java:48)
+	at org.gradle.internal.execution.steps.StoreExecutionStateStep.execute(StoreExecutionStateStep.java:46)
+	at org.gradle.internal.execution.steps.StoreExecutionStateStep.execute(StoreExecutionStateStep.java:35)
+	at org.gradle.internal.execution.steps.SkipUpToDateStep.executeBecause(SkipUpToDateStep.java:76)
+	at org.gradle.internal.execution.steps.SkipUpToDateStep.lambda$execute$2(SkipUpToDateStep.java:54)
+	at org.gradle.internal.execution.steps.SkipUpToDateStep.execute(SkipUpToDateStep.java:54)
+	at org.gradle.internal.execution.steps.SkipUpToDateStep.execute(SkipUpToDateStep.java:36)
+	at org.gradle.internal.execution.steps.legacy.MarkSnapshottingInputsFinishedStep.execute(MarkSnapshottingInputsFinishedStep.java:37)
+	at org.gradle.internal.execution.steps.legacy.MarkSnapshottingInputsFinishedStep.execute(MarkSnapshottingInputsFinishedStep.java:27)
+	at org.gradle.internal.execution.steps.ResolveIncrementalCachingStateStep.executeDelegate(ResolveIncrementalCachingStateStep.java:49)
+	at org.gradle.internal.execution.steps.ResolveIncrementalCachingStateStep.executeDelegate(ResolveIncrementalCachingStateStep.java:27)
+	at org.gradle.internal.execution.steps.AbstractResolveCachingStateStep.execute(AbstractResolveCachingStateStep.java:71)
+	at org.gradle.internal.execution.steps.AbstractResolveCachingStateStep.execute(AbstractResolveCachingStateStep.java:39)
+	at org.gradle.internal.execution.steps.ResolveChangesStep.execute(ResolveChangesStep.java:65)
+	at org.gradle.internal.execution.steps.ResolveChangesStep.execute(ResolveChangesStep.java:36)
+	at org.gradle.internal.execution.steps.ValidateStep.execute(ValidateStep.java:106)
+	at org.gradle.internal.execution.steps.ValidateStep.execute(ValidateStep.java:55)
+	at org.gradle.internal.execution.steps.AbstractCaptureStateBeforeExecutionStep.execute(AbstractCaptureStateBeforeExecutionStep.java:64)
+	at org.gradle.internal.execution.steps.AbstractCaptureStateBeforeExecutionStep.execute(AbstractCaptureStateBeforeExecutionStep.java:43)
+	at org.gradle.internal.execution.steps.AbstractSkipEmptyWorkStep.executeWithNonEmptySources(AbstractSkipEmptyWorkStep.java:125)
+	at org.gradle.internal.execution.steps.AbstractSkipEmptyWorkStep.execute(AbstractSkipEmptyWorkStep.java:56)
+	at org.gradle.internal.execution.steps.AbstractSkipEmptyWorkStep.execute(AbstractSkipEmptyWorkStep.java:36)
+	at org.gradle.internal.execution.steps.legacy.MarkSnapshottingInputsStartedStep.execute(MarkSnapshottingInputsStartedStep.java:38)
+	at org.gradle.internal.execution.steps.LoadPreviousExecutionStateStep.execute(LoadPreviousExecutionStateStep.java:36)
+	at org.gradle.internal.execution.steps.LoadPreviousExecutionStateStep.execute(LoadPreviousExecutionStateStep.java:23)
+	at org.gradle.internal.execution.steps.HandleStaleOutputsStep.execute(HandleStaleOutputsStep.java:75)
+	at org.gradle.internal.execution.steps.HandleStaleOutputsStep.execute(HandleStaleOutputsStep.java:41)
+	at org.gradle.internal.execution.steps.AssignMutableWorkspaceStep.lambda$execute$0(AssignMutableWorkspaceStep.java:35)
+	at org.gradle.api.internal.tasks.execution.TaskExecution$4.withWorkspace(TaskExecution.java:289)
+	at org.gradle.internal.execution.steps.AssignMutableWorkspaceStep.execute(AssignMutableWorkspaceStep.java:31)
+	at org.gradle.internal.execution.steps.AssignMutableWorkspaceStep.execute(AssignMutableWorkspaceStep.java:22)
+	at org.gradle.internal.execution.steps.ChoosePipelineStep.execute(ChoosePipelineStep.java:40)
+	at org.gradle.internal.execution.steps.ChoosePipelineStep.execute(ChoosePipelineStep.java:23)
+	at org.gradle.internal.execution.steps.ExecuteWorkBuildOperationFiringStep.lambda$execute$2(ExecuteWorkBuildOperationFiringStep.java:67)
+	at org.gradle.internal.execution.steps.ExecuteWorkBuildOperationFiringStep.execute(ExecuteWorkBuildOperationFiringStep.java:67)
+	at org.gradle.internal.execution.steps.ExecuteWorkBuildOperationFiringStep.execute(ExecuteWorkBuildOperationFiringStep.java:39)
+	at org.gradle.internal.execution.steps.IdentityCacheStep.execute(IdentityCacheStep.java:46)
+	at org.gradle.internal.execution.steps.IdentityCacheStep.execute(IdentityCacheStep.java:34)
+	at org.gradle.internal.execution.steps.IdentifyStep.execute(IdentifyStep.java:48)
+	at org.gradle.internal.execution.steps.IdentifyStep.execute(IdentifyStep.java:35)
+	at org.gradle.internal.execution.impl.DefaultExecutionEngine$1.execute(DefaultExecutionEngine.java:61)
+	at org.gradle.api.internal.tasks.execution.ExecuteActionsTaskExecuter.executeIfValid(ExecuteActionsTaskExecuter.java:127)
+	at org.gradle.api.internal.tasks.execution.ExecuteActionsTaskExecuter.execute(ExecuteActionsTaskExecuter.java:116)
+	at org.gradle.api.internal.tasks.execution.FinalizePropertiesTaskExecuter.execute(FinalizePropertiesTaskExecuter.java:46)
+	at org.gradle.api.internal.tasks.execution.ResolveTaskExecutionModeExecuter.execute(ResolveTaskExecutionModeExecuter.java:51)
+	at org.gradle.api.internal.tasks.execution.SkipTaskWithNoActionsExecuter.execute(SkipTaskWithNoActionsExecuter.java:57)
+	at org.gradle.api.internal.tasks.execution.SkipOnlyIfTaskExecuter.execute(SkipOnlyIfTaskExecuter.java:74)
+	at org.gradle.api.internal.tasks.execution.CatchExceptionTaskExecuter.execute(CatchExceptionTaskExecuter.java:36)
+	at org.gradle.api.internal.tasks.execution.EventFiringTaskExecuter$1.executeTask(EventFiringTaskExecuter.java:77)
+	at org.gradle.api.internal.tasks.execution.EventFiringTaskExecuter$1.call(EventFiringTaskExecuter.java:55)
+	at org.gradle.api.internal.tasks.execution.EventFiringTaskExecuter$1.call(EventFiringTaskExecuter.java:52)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:200)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:195)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:66)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:59)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:157)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:59)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.call(DefaultBuildOperationRunner.java:53)
+	at org.gradle.internal.operations.DefaultBuildOperationExecutor.call(DefaultBuildOperationExecutor.java:73)
+	at org.gradle.api.internal.tasks.execution.EventFiringTaskExecuter.execute(EventFiringTaskExecuter.java:52)
+	at org.gradle.execution.plan.LocalTaskNodeExecutor.execute(LocalTaskNodeExecutor.java:42)
+	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$InvokeNodeExecutorsAction.execute(DefaultTaskExecutionGraph.java:331)
+	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$InvokeNodeExecutorsAction.execute(DefaultTaskExecutionGraph.java:318)
+	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$BuildOperationAwareExecutionAction.lambda$execute$0(DefaultTaskExecutionGraph.java:314)
+	at org.gradle.internal.operations.CurrentBuildOperationRef.with(CurrentBuildOperationRef.java:80)
+	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$BuildOperationAwareExecutionAction.execute(DefaultTaskExecutionGraph.java:314)
+	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$BuildOperationAwareExecutionAction.execute(DefaultTaskExecutionGraph.java:303)
+	at org.gradle.execution.plan.DefaultPlanExecutor$ExecutorWorker.execute(DefaultPlanExecutor.java:463)
+	at org.gradle.execution.plan.DefaultPlanExecutor$ExecutorWorker.run(DefaultPlanExecutor.java:380)
+	at org.gradle.internal.concurrent.ExecutorPolicy$CatchAndRecordFailures.onExecute(ExecutorPolicy.java:64)
+	at org.gradle.internal.concurrent.AbstractManagedExecutor$1.run(AbstractManagedExecutor.java:47)
+Caused by: com.android.builder.dexing.DexArchiveBuilderException: Error while dexing.
+	at com.android.builder.dexing.D8DexArchiveBuilder.getExceptionToRethrow(D8DexArchiveBuilder.java:188)
+	at com.android.builder.dexing.D8DexArchiveBuilder.convert(D8DexArchiveBuilder.java:127)
+	at com.android.builder.dexing.DexArchiveBuilder.convert$default(DexArchiveBuilder.kt:44)
+	at com.android.build.gradle.internal.tasks.DexFileDependenciesTask$DexFileDependenciesWorkerAction.run(DexFileDependenciesTask.kt:152)
+	at com.android.build.gradle.internal.profile.ProfileAwareWorkAction.execute(ProfileAwareWorkAction.kt:74)
+	at org.gradle.workers.internal.DefaultWorkerServer.execute(DefaultWorkerServer.java:63)
+	at org.gradle.workers.internal.NoIsolationWorkerFactory$1$1.create(NoIsolationWorkerFactory.java:66)
+	at org.gradle.workers.internal.NoIsolationWorkerFactory$1$1.create(NoIsolationWorkerFactory.java:62)
+	at org.gradle.internal.classloader.ClassLoaderUtils.executeInClassloader(ClassLoaderUtils.java:100)
+	at org.gradle.workers.internal.NoIsolationWorkerFactory$1.lambda$execute$0(NoIsolationWorkerFactory.java:62)
+	at org.gradle.workers.internal.AbstractWorker$1.call(AbstractWorker.java:44)
+	at org.gradle.workers.internal.AbstractWorker$1.call(AbstractWorker.java:41)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:200)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:195)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:66)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:59)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:157)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:59)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.call(DefaultBuildOperationRunner.java:53)
+	at org.gradle.internal.operations.DefaultBuildOperationExecutor.call(DefaultBuildOperationExecutor.java:73)
+	at org.gradle.workers.internal.AbstractWorker.executeWrappedInBuildOperation(AbstractWorker.java:41)
+	at org.gradle.workers.internal.NoIsolationWorkerFactory$1.execute(NoIsolationWorkerFactory.java:59)
+	at org.gradle.workers.internal.DefaultWorkerExecutor.lambda$submitWork$0(DefaultWorkerExecutor.java:174)
+	at org.gradle.internal.work.DefaultConditionalExecutionQueue$ExecutionRunner.runExecution(DefaultConditionalExecutionQueue.java:187)
+	at org.gradle.internal.work.DefaultConditionalExecutionQueue$ExecutionRunner.access$700(DefaultConditionalExecutionQueue.java:120)
+	at org.gradle.internal.work.DefaultConditionalExecutionQueue$ExecutionRunner$1.run(DefaultConditionalExecutionQueue.java:162)
+	at org.gradle.internal.Factories$1.create(Factories.java:31)
+	at org.gradle.internal.work.DefaultWorkerLeaseService.withLocks(DefaultWorkerLeaseService.java:264)
+	at org.gradle.internal.work.DefaultWorkerLeaseService.runAsWorkerThread(DefaultWorkerLeaseService.java:128)
+	at org.gradle.internal.work.DefaultWorkerLeaseService.runAsWorkerThread(DefaultWorkerLeaseService.java:133)
+	at org.gradle.internal.work.DefaultConditionalExecutionQueue$ExecutionRunner.runBatch(DefaultConditionalExecutionQueue.java:157)
+	at org.gradle.internal.work.DefaultConditionalExecutionQueue$ExecutionRunner.run(DefaultConditionalExecutionQueue.java:126)
+	... 2 more
+Caused by: com.android.tools.r8.CompilationFailedException: Compilation failed to complete, position: Loffline/fix/FashionCharListFix;applyFashion(Ldata/CharData;Loffline/persistence/player/CharacterRecord;)V, origin: /home/runner/work/KPAH-v255-APK/KPAH-v255-APK/runtime/app/libs/KPAH.jar:offline/fix/FashionCharListFix.class
+	at Version.fakeStackEntry(Version_8.5.27.java:0)
+	at com.android.tools.r8.T.a(R8_8.5.27_94f7c8abc2cc97a24dd86f020924fa3c7a213e916bdc3fc7dfb7c7d1f983d8b3:5)
+	at com.android.tools.r8.internal.so.a(R8_8.5.27_94f7c8abc2cc97a24dd86f020924fa3c7a213e916bdc3fc7dfb7c7d1f983d8b3:82)
+	at com.android.tools.r8.internal.so.a(R8_8.5.27_94f7c8abc2cc97a24dd86f020924fa3c7a213e916bdc3fc7dfb7c7d1f983d8b3:32)
+	at com.android.tools.r8.internal.so.a(R8_8.5.27_94f7c8abc2cc97a24dd86f020924fa3c7a213e916bdc3fc7dfb7c7d1f983d8b3:31)
+	at com.android.tools.r8.internal.so.b(R8_8.5.27_94f7c8abc2cc97a24dd86f020924fa3c7a213e916bdc3fc7dfb7c7d1f983d8b3:2)
+	at com.android.tools.r8.D8.run(R8_8.5.27_94f7c8abc2cc97a24dd86f020924fa3c7a213e916bdc3fc7dfb7c7d1f983d8b3:11)
+	at com.android.builder.dexing.D8DexArchiveBuilder.convert(D8DexArchiveBuilder.java:125)
+	... 32 more
+Caused by: com.android.tools.r8.internal.Ke: Undefined value encountered during compilation. This is typically caused by invalid dex input that uses a register that is not defined on all control-flow paths leading to the use.
+	at com.android.tools.r8.internal.QW.a(R8_8.5.27_94f7c8abc2cc97a24dd86f020924fa3c7a213e916bdc3fc7dfb7c7d1f983d8b3:42)
+	at com.android.tools.r8.internal.Jt.a(R8_8.5.27_94f7c8abc2cc97a24dd86f020924fa3c7a213e916bdc3fc7dfb7c7d1f983d8b3:982)
+	at com.android.tools.r8.internal.QW.a(R8_8.5.27_94f7c8abc2cc97a24dd86f020924fa3c7a213e916bdc3fc7dfb7c7d1f983d8b3:19)
+	at com.android.tools.r8.internal.Jt.a(R8_8.5.27_94f7c8abc2cc97a24dd86f020924fa3c7a213e916bdc3fc7dfb7c7d1f983d8b3:982)
+	at com.android.tools.r8.internal.QW.a(R8_8.5.27_94f7c8abc2cc97a24dd86f020924fa3c7a213e916bdc3fc7dfb7c7d1f983d8b3:19)
+	at com.android.tools.r8.internal.H5.a(R8_8.5.27_94f7c8abc2cc97a24dd86f020924fa3c7a213e916bdc3fc7dfb7c7d1f983d8b3:178)
+	at com.android.tools.r8.internal.Jt.c(R8_8.5.27_94f7c8abc2cc97a24dd86f020924fa3c7a213e916bdc3fc7dfb7c7d1f983d8b3:26)
+	at com.android.tools.r8.internal.Jt.a(R8_8.5.27_94f7c8abc2cc97a24dd86f020924fa3c7a213e916bdc3fc7dfb7c7d1f983d8b3:1227)
+	at com.android.tools.r8.internal.Jt.a(R8_8.5.27_94f7c8abc2cc97a24dd86f020924fa3c7a213e916bdc3fc7dfb7c7d1f983d8b3:705)
+	at com.android.tools.r8.internal.p9.a(R8_8.5.27_94f7c8abc2cc97a24dd86f020924fa3c7a213e916bdc3fc7dfb7c7d1f983d8b3:8)
+	at com.android.tools.r8.internal.Ca.a(R8_8.5.27_94f7c8abc2cc97a24dd86f020924fa3c7a213e916bdc3fc7dfb7c7d1f983d8b3:205)
+	at com.android.tools.r8.internal.Jt.a(R8_8.5.27_94f7c8abc2cc97a24dd86f020924fa3c7a213e916bdc3fc7dfb7c7d1f983d8b3:270)
+	at com.android.tools.r8.graph.G.a(R8_8.5.27_94f7c8abc2cc97a24dd86f020924fa3c7a213e916bdc3fc7dfb7c7d1f983d8b3:222)
+	at com.android.tools.r8.graph.G.a(R8_8.5.27_94f7c8abc2cc97a24dd86f020924fa3c7a213e916bdc3fc7dfb7c7d1f983d8b3:157)
+	at com.android.tools.r8.graph.n4.a(R8_8.5.27_94f7c8abc2cc97a24dd86f020924fa3c7a213e916bdc3fc7dfb7c7d1f983d8b3:38)
+	at com.android.tools.r8.graph.A5.a(R8_8.5.27_94f7c8abc2cc97a24dd86f020924fa3c7a213e916bdc3fc7dfb7c7d1f983d8b3:4)
+	at com.android.tools.r8.internal.St.d(R8_8.5.27_94f7c8abc2cc97a24dd86f020924fa3c7a213e916bdc3fc7dfb7c7d1f983d8b3:24)
+	at com.android.tools.r8.internal.dY.a(R8_8.5.27_94f7c8abc2cc97a24dd86f020924fa3c7a213e916bdc3fc7dfb7c7d1f983d8b3:271)
+	at com.android.tools.r8.internal.so.a(R8_8.5.27_94f7c8abc2cc97a24dd86f020924fa3c7a213e916bdc3fc7dfb7c7d1f983d8b3:135)
+	at com.android.tools.r8.internal.dY.b(R8_8.5.27_94f7c8abc2cc97a24dd86f020924fa3c7a213e916bdc3fc7dfb7c7d1f983d8b3:5)
+	at com.android.tools.r8.internal.vh.b(R8_8.5.27_94f7c8abc2cc97a24dd86f020924fa3c7a213e916bdc3fc7dfb7c7d1f983d8b3:148)
+	at com.android.tools.r8.internal.dY.a(R8_8.5.27_94f7c8abc2cc97a24dd86f020924fa3c7a213e916bdc3fc7dfb7c7d1f983d8b3:242)
+	at com.android.tools.r8.internal.Vb.a(R8_8.5.27_94f7c8abc2cc97a24dd86f020924fa3c7a213e916bdc3fc7dfb7c7d1f983d8b3:1)
+	at com.android.tools.r8.internal.Xb.b(R8_8.5.27_94f7c8abc2cc97a24dd86f020924fa3c7a213e916bdc3fc7dfb7c7d1f983d8b3:26)
+	at com.android.tools.r8.internal.bh0.a(R8_8.5.27_94f7c8abc2cc97a24dd86f020924fa3c7a213e916bdc3fc7dfb7c7d1f983d8b3:23)
+	at com.android.tools.r8.internal.bh0.a(R8_8.5.27_94f7c8abc2cc97a24dd86f020924fa3c7a213e916bdc3fc7dfb7c7d1f983d8b3:34)
+	at com.android.tools.r8.internal.bh0.a(R8_8.5.27_94f7c8abc2cc97a24dd86f020924fa3c7a213e916bdc3fc7dfb7c7d1f983d8b3:17)
+	at com.google.common.util.concurrent.TrustedListenableFutureTask$TrustedFutureInterruptibleTask.runInterruptibly(TrustedListenableFutureTask.java:131)
+	at com.google.common.util.concurrent.InterruptibleTask.run(InterruptibleTask.java:75)
+	at com.google.common.util.concurrent.TrustedListenableFutureTask.run(TrustedListenableFutureTask.java:82)
+	at com.google.common.util.concurrent.MoreExecutors$DirectExecutorService.execute(MoreExecutors.java:327)
+	at com.google.common.util.concurrent.AbstractListeningExecutorService.submit(AbstractListeningExecutorService.java:79)
+	at com.google.common.util.concurrent.AbstractListeningExecutorService.submit(AbstractListeningExecutorService.java:37)
+	at com.android.tools.r8.internal.ch0.submit(R8_8.5.27_94f7c8abc2cc97a24dd86f020924fa3c7a213e916bdc3fc7dfb7c7d1f983d8b3:1)
+	at com.android.tools.r8.internal.Og0.a(R8_8.5.27_94f7c8abc2cc97a24dd86f020924fa3c7a213e916bdc3fc7dfb7c7d1f983d8b3:1)
+	at com.android.tools.r8.internal.bh0.a(R8_8.5.27_94f7c8abc2cc97a24dd86f020924fa3c7a213e916bdc3fc7dfb7c7d1f983d8b3:19)
+	at com.android.tools.r8.internal.Rq.a(R8_8.5.27_94f7c8abc2cc97a24dd86f020924fa3c7a213e916bdc3fc7dfb7c7d1f983d8b3:3)
+	at com.android.tools.r8.internal.Rq.a(R8_8.5.27_94f7c8abc2cc97a24dd86f020924fa3c7a213e916bdc3fc7dfb7c7d1f983d8b3:2)
+	at com.android.tools.r8.internal.bh0.a(R8_8.5.27_94f7c8abc2cc97a24dd86f020924fa3c7a213e916bdc3fc7dfb7c7d1f983d8b3:10)
+	at com.android.tools.r8.internal.bh0.a(R8_8.5.27_94f7c8abc2cc97a24dd86f020924fa3c7a213e916bdc3fc7dfb7c7d1f983d8b3:33)
+	at com.android.tools.r8.internal.bh0.a(R8_8.5.27_94f7c8abc2cc97a24dd86f020924fa3c7a213e916bdc3fc7dfb7c7d1f983d8b3:25)
+	at com.android.tools.r8.internal.bh0.a(R8_8.5.27_94f7c8abc2cc97a24dd86f020924fa3c7a213e916bdc3fc7dfb7c7d1f983d8b3:22)
+	at com.android.tools.r8.K.a(R8_8.5.27_94f7c8abc2cc97a24dd86f020924fa3c7a213e916bdc3fc7dfb7c7d1f983d8b3:3)
+	at com.android.tools.r8.internal.Xb.a(R8_8.5.27_94f7c8abc2cc97a24dd86f020924fa3c7a213e916bdc3fc7dfb7c7d1f983d8b3:63)
+	at com.android.tools.r8.internal.dY.a(R8_8.5.27_94f7c8abc2cc97a24dd86f020924fa3c7a213e916bdc3fc7dfb7c7d1f983d8b3:193)
+	at com.android.tools.r8.internal.dY.a(R8_8.5.27_94f7c8abc2cc97a24dd86f020924fa3c7a213e916bdc3fc7dfb7c7d1f983d8b3:15)
+	at com.android.tools.r8.D8.d(R8_8.5.27_94f7c8abc2cc97a24dd86f020924fa3c7a213e916bdc3fc7dfb7c7d1f983d8b3:60)
+	at com.android.tools.r8.D8.b(R8_8.5.27_94f7c8abc2cc97a24dd86f020924fa3c7a213e916bdc3fc7dfb7c7d1f983d8b3:1)
+	at com.android.tools.r8.internal.so.a(R8_8.5.27_94f7c8abc2cc97a24dd86f020924fa3c7a213e916bdc3fc7dfb7c7d1f983d8b3:28)
+	... 35 more
+	Suppressed: java.lang.RuntimeException: java.util.concurrent.ExecutionException: com.android.tools.r8.internal.uo: com.android.tools.r8.internal.Ke: Undefined value encountered during compilation. This is typically caused by invalid dex input that uses a register that is not defined on all control-flow paths leading to the use.
+		at com.android.tools.r8.internal.so.a(R8_8.5.27_94f7c8abc2cc97a24dd86f020924fa3c7a213e916bdc3fc7dfb7c7d1f983d8b3:132)
+		at com.android.tools.r8.D8.d(R8_8.5.27_94f7c8abc2cc97a24dd86f020924fa3c7a213e916bdc3fc7dfb7c7d1f983d8b3:165)
+		at com.android.tools.r8.D8.b(R8_8.5.27_94f7c8abc2cc97a24dd86f020924fa3c7a213e916bdc3fc7dfb7c7d1f983d8b3:1)
+		at com.android.tools.r8.internal.so.a(R8_8.5.27_94f7c8abc2cc97a24dd86f020924fa3c7a213e916bdc3fc7dfb7c7d1f983d8b3:28)
+		at com.android.tools.r8.internal.so.b(R8_8.5.27_94f7c8abc2cc97a24dd86f020924fa3c7a213e916bdc3fc7dfb7c7d1f983d8b3:2)
+		at com.android.tools.r8.D8.run(R8_8.5.27_94f7c8abc2cc97a24dd86f020924fa3c7a213e916bdc3fc7dfb7c7d1f983d8b3:11)
+		at com.android.builder.dexing.D8DexArchiveBuilder.convert(D8DexArchiveBuilder.java:125)
+		at com.android.builder.dexing.DexArchiveBuilder.convert$default(DexArchiveBuilder.kt:44)
+		at com.android.build.gradle.internal.tasks.DexFileDependenciesTask$DexFileDependenciesWorkerAction.run(DexFileDependenciesTask.kt:152)
+		at com.android.build.gradle.internal.profile.ProfileAwareWorkAction.execute(ProfileAwareWorkAction.kt:74)
+		at org.gradle.workers.internal.DefaultWorkerServer.execute(DefaultWorkerServer.java:63)
+		at org.gradle.workers.internal.NoIsolationWorkerFactory$1$1.create(NoIsolationWorkerFactory.java:66)
+		at org.gradle.workers.internal.NoIsolationWorkerFactory$1$1.create(NoIsolationWorkerFactory.java:62)
+		at org.gradle.internal.classloader.ClassLoaderUtils.executeInClassloader(ClassLoaderUtils.java:100)
+		at org.gradle.workers.internal.NoIsolationWorkerFactory$1.lambda$execute$0(NoIsolationWorkerFactory.java:62)
+		at org.gradle.workers.internal.AbstractWorker$1.call(AbstractWorker.java:44)
+		at org.gradle.workers.internal.AbstractWorker$1.call(AbstractWorker.java:41)
+		at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:200)
+		at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:195)
+		at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:66)
+		at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:59)
+		at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:157)
+		at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:59)
+		at org.gradle.internal.operations.DefaultBuildOperationRunner.call(DefaultBuildOperationRunner.java:53)
+		at org.gradle.internal.operations.DefaultBuildOperationExecutor.call(DefaultBuildOperationExecutor.java:73)
+		at org.gradle.workers.internal.AbstractWorker.executeWrappedInBuildOperation(AbstractWorker.java:41)
+		at org.gradle.workers.internal.NoIsolationWorkerFactory$1.execute(NoIsolationWorkerFactory.java:59)
+		at org.gradle.workers.internal.DefaultWorkerExecutor.lambda$submitWork$0(DefaultWorkerExecutor.java:174)
+		at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:264)
+		at org.gradle.internal.work.DefaultConditionalExecutionQueue$ExecutionRunner.runExecution(DefaultConditionalExecutionQueue.java:187)
+		at org.gradle.internal.work.DefaultConditionalExecutionQueue$ExecutionRunner.access$700(DefaultConditionalExecutionQueue.java:120)
+		at org.gradle.internal.work.DefaultConditionalExecutionQueue$ExecutionRunner$1.run(DefaultConditionalExecutionQueue.java:162)
+		at org.gradle.internal.Factories$1.create(Factories.java:31)
+		at org.gradle.internal.work.DefaultWorkerLeaseService.withLocks(DefaultWorkerLeaseService.java:264)
+		at org.gradle.internal.work.DefaultWorkerLeaseService.runAsWorkerThread(DefaultWorkerLeaseService.java:128)
+		at org.gradle.internal.work.DefaultWorkerLeaseService.runAsWorkerThread(DefaultWorkerLeaseService.java:133)
+		at org.gradle.internal.work.DefaultConditionalExecutionQueue$ExecutionRunner.runBatch(DefaultConditionalExecutionQueue.java:157)
+		at org.gradle.internal.work.DefaultConditionalExecutionQueue$ExecutionRunner.run(DefaultConditionalExecutionQueue.java:126)
+		at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:539)
+		at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:264)
+		at org.gradle.internal.concurrent.ExecutorPolicy$CatchAndRecordFailures.onExecute(ExecutorPolicy.java:64)
+		at org.gradle.internal.concurrent.AbstractManagedExecutor$1.run(AbstractManagedExecutor.java:47)
+		at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1136)
+		at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:635)
+		at java.base/java.lang.Thread.run(Thread.java:840)
+	Caused by: java.util.concurrent.ExecutionException: com.android.tools.r8.internal.uo: com.android.tools.r8.internal.Ke: Undefined value encountered during compilation. This is typically caused by invalid dex input that uses a register that is not defined on all control-flow paths leading to the use.
+		at com.google.common.util.concurrent.AbstractFuture.getDoneValue(AbstractFuture.java:592)
+		at com.google.common.util.concurrent.AbstractFuture.get(AbstractFuture.java:551)
+		at com.google.common.util.concurrent.FluentFuture$TrustedFuture.get(FluentFuture.java:91)
+		at com.android.tools.r8.internal.ch0.awaitFutures(R8_8.5.27_94f7c8abc2cc97a24dd86f020924fa3c7a213e916bdc3fc7dfb7c7d1f983d8b3:4)
+		at com.android.tools.r8.internal.Og0.a(R8_8.5.27_94f7c8abc2cc97a24dd86f020924fa3c7a213e916bdc3fc7dfb7c7d1f983d8b3:2)
+		at com.android.tools.r8.internal.Og0.a(R8_8.5.27_94f7c8abc2cc97a24dd86f020924fa3c7a213e916bdc3fc7dfb7c7d1f983d8b3:13)
+		at com.android.tools.r8.internal.Og0.a(R8_8.5.27_94f7c8abc2cc97a24dd86f020924fa3c7a213e916bdc3fc7dfb7c7d1f983d8b3:14)
+		at com.android.tools.r8.internal.bh0.a(R8_8.5.27_94f7c8abc2cc97a24dd86f020924fa3c7a213e916bdc3fc7dfb7c7d1f983d8b3:15)
+		at com.android.tools.r8.internal.bh0.a(R8_8.5.27_94f7c8abc2cc97a24dd86f020924fa3c7a213e916bdc3fc7dfb7c7d1f983d8b3:33)
+		at com.android.tools.r8.internal.bh0.a(R8_8.5.27_94f7c8abc2cc97a24dd86f020924fa3c7a213e916bdc3fc7dfb7c7d1f983d8b3:25)
+		at com.android.tools.r8.internal.bh0.a(R8_8.5.27_94f7c8abc2cc97a24dd86f020924fa3c7a213e916bdc3fc7dfb7c7d1f983d8b3:22)
+		at com.android.tools.r8.K.a(R8_8.5.27_94f7c8abc2cc97a24dd86f020924fa3c7a213e916bdc3fc7dfb7c7d1f983d8b3:3)
+		at com.android.tools.r8.internal.Xb.a(R8_8.5.27_94f7c8abc2cc97a24dd86f020924fa3c7a213e916bdc3fc7dfb7c7d1f983d8b3:63)
+		at com.android.tools.r8.internal.dY.a(R8_8.5.27_94f7c8abc2cc97a24dd86f020924fa3c7a213e916bdc3fc7dfb7c7d1f983d8b3:193)
+		at com.android.tools.r8.internal.dY.a(R8_8.5.27_94f7c8abc2cc97a24dd86f020924fa3c7a213e916bdc3fc7dfb7c7d1f983d8b3:15)
+		at com.android.tools.r8.D8.d(R8_8.5.27_94f7c8abc2cc97a24dd86f020924fa3c7a213e916bdc3fc7dfb7c7d1f983d8b3:60)
+		... 43 more
+	Caused by: com.android.tools.r8.internal.uo: com.android.tools.r8.internal.Ke: Undefined value encountered during compilation. This is typically caused by invalid dex input that uses a register that is not defined on all control-flow paths leading to the use.
+		at com.android.tools.r8.internal.so.a(R8_8.5.27_94f7c8abc2cc97a24dd86f020924fa3c7a213e916bdc3fc7dfb7c7d1f983d8b3:155)
+		at com.android.tools.r8.internal.dY.b(R8_8.5.27_94f7c8abc2cc97a24dd86f020924fa3c7a213e916bdc3fc7dfb7c7d1f983d8b3:5)
+		at com.android.tools.r8.internal.vh.b(R8_8.5.27_94f7c8abc2cc97a24dd86f020924fa3c7a213e916bdc3fc7dfb7c7d1f983d8b3:148)
+		at com.android.tools.r8.internal.dY.a(R8_8.5.27_94f7c8abc2cc97a24dd86f020924fa3c7a213e916bdc3fc7dfb7c7d1f983d8b3:242)
+		at com.android.tools.r8.internal.Vb.a(R8_8.5.27_94f7c8abc2cc97a24dd86f020924fa3c7a213e916bdc3fc7dfb7c7d1f983d8b3:1)
+		at com.android.tools.r8.internal.Xb.b(R8_8.5.27_94f7c8abc2cc97a24dd86f020924fa3c7a213e916bdc3fc7dfb7c7d1f983d8b3:26)
+		at com.android.tools.r8.internal.bh0.a(R8_8.5.27_94f7c8abc2cc97a24dd86f020924fa3c7a213e916bdc3fc7dfb7c7d1f983d8b3:23)
+		at com.android.tools.r8.internal.bh0.a(R8_8.5.27_94f7c8abc2cc97a24dd86f020924fa3c7a213e916bdc3fc7dfb7c7d1f983d8b3:34)
+		at com.android.tools.r8.internal.bh0.a(R8_8.5.27_94f7c8abc2cc97a24dd86f020924fa3c7a213e916bdc3fc7dfb7c7d1f983d8b3:17)
+		at com.google.common.util.concurrent.TrustedListenableFutureTask$TrustedFutureInterruptibleTask.runInterruptibly(TrustedListenableFutureTask.java:131)
+		at com.google.common.util.concurrent.InterruptibleTask.run(InterruptibleTask.java:75)
+		at com.google.common.util.concurrent.TrustedListenableFutureTask.run(TrustedListenableFutureTask.java:82)
+		at com.google.common.util.concurrent.MoreExecutors$DirectExecutorService.execute(MoreExecutors.java:327)
+		at java.base/java.util.concurrent.AbstractExecutorService.submit(AbstractExecutorService.java:145)
+		at com.google.common.util.concurrent.AbstractListeningExecutorService.submit(AbstractListeningExecutorService.java:79)
+		at com.google.common.util.concurrent.AbstractListeningExecutorService.submit(AbstractListeningExecutorService.java:37)
+		at com.android.tools.r8.internal.ch0.submit(R8_8.5.27_94f7c8abc2cc97a24dd86f020924fa3c7a213e916bdc3fc7dfb7c7d1f983d8b3:1)
+		at com.android.tools.r8.internal.Og0.a(R8_8.5.27_94f7c8abc2cc97a24dd86f020924fa3c7a213e916bdc3fc7dfb7c7d1f983d8b3:1)
+		at com.android.tools.r8.internal.bh0.a(R8_8.5.27_94f7c8abc2cc97a24dd86f020924fa3c7a213e916bdc3fc7dfb7c7d1f983d8b3:19)
+		at com.android.tools.r8.internal.Rq.a(R8_8.5.27_94f7c8abc2cc97a24dd86f020924fa3c7a213e916bdc3fc7dfb7c7d1f983d8b3:3)
+		at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+		at com.android.tools.r8.internal.Rq.a(R8_8.5.27_94f7c8abc2cc97a24dd86f020924fa3c7a213e916bdc3fc7dfb7c7d1f983d8b3:2)
+		at com.android.tools.r8.internal.bh0.a(R8_8.5.27_94f7c8abc2cc97a24dd86f020924fa3c7a213e916bdc3fc7dfb7c7d1f983d8b3:10)
+		... 51 more
+	Caused by: [CIRCULAR REFERENCE: com.android.tools.r8.internal.Ke: Undefined value encountered during compilation. This is typically caused by invalid dex input that uses a register that is not defined on all control-flow paths leading to the use.]
+
+
+BUILD FAILED in 1m 49s
+51 actionable tasks: 51 executed
