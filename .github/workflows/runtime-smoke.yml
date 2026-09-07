@@ -1,0 +1,54 @@
+name: Runtime Smoke Test
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - '.github/workflows/runtime-smoke.yml'
+  workflow_dispatch:
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v3
+      - name: Install Android components
+        run: |
+          yes | sdkmanager --licenses >/dev/null || true
+          sdkmanager "platforms;android-34" "build-tools;34.0.0" "ndk;22.1.7171670"
+      - name: Prepare runtime
+        run: |
+          git clone https://github.com/nikita36078/J2ME-Loader.git runtime
+          cd runtime
+          git checkout 9b0fa48a0a0d1e61376c0b9af28b3d2caec0a4cc
+          cd ..
+          keytool -genkeypair -v -keystore runtime/kpah-build.keystore -storepass android -keypass android -alias kpah -keyalg RSA -keysize 2048 -validity 10000 -dname "CN=KPAHvip,O=KPAH,C=VN"
+          printf '%s\n' 'storeFile=kpah-build.keystore' 'storePassword=android' 'keyAlias=kpah' 'keyPassword=android' > runtime/keystore.properties
+          python3 scripts/prepare_port.py runtime "$GITHUB_WORKSPACE/KPAHtuoitho_drg.jar"
+          python3 scripts/apply_dexsafe_patches.py runtime/app/libs/KPAH.jar runtime/app/libs/KPAH.patched.jar
+          mv runtime/app/libs/KPAH.patched.jar runtime/app/libs/KPAH.jar
+          cd runtime
+          chmod +x gradlew
+          ./gradlew :app:assembleMidletDebug --no-daemon
+      - name: Launch on Android 34 emulator
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 34
+          arch: x86_64
+          profile: pixel_2
+          disable-animations: true
+          script: |
+            APK=$(find runtime/app/build/outputs/apk -type f -name '*.apk' | head -n 1)
+            adb install -r "$APK"
+            adb logcat -c
+            adb shell am start -W -n com.example.androidlet.kpahvip.debug/javax.microedition.shell.MicroActivity || true
+            sleep 10
+            echo '=== PID ==='
+            adb shell pidof com.example.androidlet.kpahvip.debug || true
+            echo '=== CRASH LOG ==='
+            adb logcat -d -v brief | grep -E 'AndroidRuntime|FATAL EXCEPTION|kpahvip|GameMidlet|MicroActivity|MicroLoader' | tail -n 300 || true
