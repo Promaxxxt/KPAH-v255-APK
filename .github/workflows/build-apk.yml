@@ -7,6 +7,7 @@ on:
     paths:
       - 'KPAHtuoitho_drg.jar'
       - 'scripts/**'
+      - 'patches/**'
       - '.github/workflows/build-apk.yml'
 
 permissions:
@@ -58,6 +59,48 @@ jobs:
       - name: Prepare KPAH standalone port
         run: |
           python3 scripts/prepare_port.py runtime "$GITHUB_WORKSPACE/KPAHtuoitho_drg.jar"
+
+      - name: Apply dex-safe bytecode patches
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import base64
+          import zipfile
+          from pathlib import Path
+
+          jar = Path('runtime/app/libs/KPAH.jar')
+          patch_dir = Path('patches')
+          targets = {
+              'offline/fix/ArcherPoisonMonsterFix.class': 'offline__fix__ArcherPoisonMonsterFix.class.b64',
+              'offline/fix/ArcherPoisonTickSync.class': 'offline__fix__ArcherPoisonTickSync.class.b64',
+              'offline/persistence/player/MemoryPlayerStore.class': 'offline__persistence__player__MemoryPlayerStore.class.b64',
+              'offline/persistence/rms/RmsPlayerStore.class': 'offline__persistence__rms__RmsPlayerStore.class.b64',
+          }
+
+          replacements = {
+              name: base64.b64decode((patch_dir / filename).read_text(encoding='ascii').strip())
+              for name, filename in targets.items()
+          }
+
+          tmp = jar.with_suffix('.patched.jar')
+          replaced = set()
+          with zipfile.ZipFile(jar, 'r') as zin, zipfile.ZipFile(tmp, 'w') as zout:
+              for info in zin.infolist():
+                  if info.filename in replacements:
+                      zout.writestr(info, replacements[info.filename])
+                      replaced.add(info.filename)
+                  else:
+                      zout.writestr(info, zin.read(info.filename))
+
+          missing = set(replacements) - replaced
+          if missing:
+              raise SystemExit('Patch targets missing from JAR: ' + ', '.join(sorted(missing)))
+
+          tmp.replace(jar)
+          print('Patched dex-safe classes:')
+          for name in sorted(replaced):
+              print(' -', name, len(replacements[name]), 'bytes')
+          PY
 
       - name: Build standalone APK
         working-directory: runtime
