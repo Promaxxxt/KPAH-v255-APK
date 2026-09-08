@@ -25,6 +25,27 @@ Fishing maps:
 - 15: ca loc area
 - 16: ca map area
 
+## Source-first progress
+
+- Confirmed `avatar2-fishing` is based on the V122 policy rather than V125/V126.
+- Isolated the V122 -> later map-entry compatibility delta: `sendJoinPark` must preserve the requested map byte instead of discarding it.
+- Added `client-reference/FISHING_PROTOCOL_REFERENCE.md` so experimental command/resource observations are documented without turning V126 into the baseline.
+- Added `tools/import_server_source.py` to import only Java/Maven source from `server.rar` or an extracted server directory while excluding raw SQL, local configuration, binaries and build output.
+- Added automated fishing contract/import-safety tests and wired them into CI.
+- Fishing gameplay is **not yet complete**. NPC/shop/cast/catch behavior must still be reconstructed from the imported server source and pass the acceptance sequence below.
+
+## Server classes to inspect first
+
+After `server-src` is imported, trace the source in this order:
+
+1. `avatar/common/FishHelper.java`
+2. `avatar/handler/NpcHandler.java`
+3. `avatar/manager/NpcManager.java`
+4. `avatar/model/NpcShop.java` and `NpcShopItem.java`
+5. `avatar/map/MapService.java`, `MapManager.java`, `MapID.java`, `Zone.java`
+6. `avatar/service/ParkService.java` and `avatar/handler/ParkMsgHandler.java`
+7. persistence classes reached by the fishing flow
+
 ## Source-first workflow
 
 1. Import sanitized extracted server source.
@@ -33,3 +54,18 @@ Fishing maps:
 4. Add automated packet/asset checks.
 5. Build one test JAR.
 6. Validate the complete acceptance test before merging.
+
+## Fishing acceptance test
+
+1. Login succeeds.
+2. Enter map 13 (Khu Sinh Thai).
+3. Fisher NPC visibly renders and can be interacted with.
+4. Fisher menu opens without loading/spinning forever.
+5. Fishing shop opens and lists the expected rods, bait and tickets.
+6. Buy operations return normally and inventory updates.
+7. Enter maps 14, 15 and 16.
+8. Sit at a valid fishing spot without hanging.
+9. Start fishing, cast, receive the native arrow mini-game, submit input and get a result.
+10. Caught fish is persisted.
+11. Selling fish updates currency.
+12. Exit/reopen the game and verify fishing data persists.

@@ -21,6 +21,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Source-first fishing contract tests
+        shell: bash
+        run: python3 -m unittest discover Avatar2-Offline/tests -p 'test_*.py' -v
+
       - name: Secret scan
         shell: bash
         run: |
