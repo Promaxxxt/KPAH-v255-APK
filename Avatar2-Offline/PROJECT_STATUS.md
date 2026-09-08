@@ -12,48 +12,46 @@ Known stable area: farm flow from the V122 line.
 
 - V124 anchor-map experiment: abandoned.
 - V125 fishing full experiment: NPC/shop/fishing flow did not function correctly in the real client.
-- V126 native-protocol experiment: protocol/resources were partially corrected but has not been validated end-to-end in the user's emulator.
+- V126 native-protocol experiment: reference only; do not inherit its ad-hoc fishing serializers.
 
 ## Current objective
 
-Rebuild fishing from source with the server implementation as the authoritative behavior reference and the actual client only as a protocol/render compatibility reference.
+Rebuild fishing from source with the extracted server implementation as authoritative behavior reference and V122 as the stable client/offline baseline.
 
 Fishing maps:
 
 - 13: ecological/fishing hub
-- 14: ca ro area
-- 15: ca loc area
-- 16: ca map area
+- 14: cá rô area
+- 15: cá lóc area
+- 16: cá mập area
 
 ## Source-first progress
 
-- Confirmed `avatar2-fishing` is based on the V122 policy rather than V125/V126.
-- Isolated the V122 -> later map-entry compatibility delta: `sendJoinPark` must preserve the requested map byte instead of discarding it.
-- Added `client-reference/FISHING_PROTOCOL_REFERENCE.md` so experimental command/resource observations are documented without turning V126 into the baseline.
-- Added `tools/import_server_source.py` to import only Java/Maven source from `server.rar` or an extracted server directory while excluding raw SQL, local configuration, binaries and build output.
-- Added automated fishing contract/import-safety tests and wired them into CI.
-- Fishing gameplay is **not yet complete**. NPC/shop/cast/catch behavior must still be reconstructed from the imported server source and pass the acceptance sequence below.
+- `server.rar` was successfully extracted as RAR5 using system libarchive; the archive contains the real Maven server source.
+- Added `tools/extract_rar5.py` so the extraction path is reproducible even when `unrar`/`7z`/`bsdtar` executables are absent.
+- Inspected authoritative classes: `FishHelper`, `NpcHandler`, `ParkMsgHandler`, `ParkService`, `AvatarService`, `ItemManager`, `NpcIDs` and `Cmd`.
+- Added `client-reference/FISHING_SERVER_CONTRACT.md` with the exact NPC, command, map requirement, fish-pool and shop contract from source/database.
+- Confirmed fisherman: base id `430`, client id `2000000430`, map `13`, position `(326,64)`, parts `[3387,3386,0,82,3385,3384,442]`.
+- Confirmed native menu path is `openMenuOption(...)` and native fishing shop path is `openShopParts(10, "Câu cá", shop10)`.
+- Confirmed commands `82/84/85/86/87/88/91` and the server-side fishing flow.
+- Updated automated contract tests with exact map requirements, fish weights, points and shop prices.
+- Identified a likely V126 failure mode: it intercepted fishing packets before `AvatarProtocol` while reproducing some world/NPC/shop state with custom reduced serializers. New implementation must reuse the native packet shapes instead.
 
-## Server classes to inspect first
+## Authoritative fishing requirements
 
-After `server-src` is imported, trace the source in this order:
+- Map 14: rods `442/445/446`, ticket `458`, bait `443`.
+- Map 15: rods `445/446`, ticket `459`, bait `447`.
+- Map 16: rod `446`, ticket `460`, bait `448`.
+- Fish pools and scores are defined in `tools/fishing_contract.py` and locked by tests.
 
-1. `avatar/common/FishHelper.java`
-2. `avatar/handler/NpcHandler.java`
-3. `avatar/manager/NpcManager.java`
-4. `avatar/model/NpcShop.java` and `NpcShopItem.java`
-5. `avatar/map/MapService.java`, `MapManager.java`, `MapID.java`, `Zone.java`
-6. `avatar/service/ParkService.java` and `avatar/handler/ParkMsgHandler.java`
-7. persistence classes reached by the fishing flow
+## Next implementation slice
 
-## Source-first workflow
-
-1. Import sanitized extracted server source.
-2. Identify the exact classes responsible for map entry, NPC creation, shop, purchase, fishing start, cast, catch result, sale and persistence.
-3. Mirror required logic in offline source.
-4. Add automated packet/asset checks.
-5. Build one test JAR.
-6. Validate the complete acceptance test before merging.
+1. Build a clean offline fishing handler against V122-compatible server classes.
+2. Reuse the existing V122 park/NPC serializer; inject NPC 430 through that serializer rather than a custom join packet.
+3. Reuse the exact `MENU_OPTION` and `OPEN_SHOP` payload shapes from `AvatarService`.
+4. Implement start/cast/fish/handle-fishing in source with deterministic tests for packet payloads.
+5. Add persistence for fishing inventory/state.
+6. Produce one test JAR only after compile/tests pass.
 
 ## Fishing acceptance test
 
