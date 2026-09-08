@@ -1,12 +1,5 @@
 import java.util.Vector;
 
-/**
- * Local park entry bridge used by the offline client.
- *
- * Fishing maps are entered locally by bf.a(map, zone), which calls this class
- * directly instead of waiting for AVATAR_JOIN_PARK from the offline server.
- * Therefore map 13 must inject fisherman NPC 430 into the entity Vector here.
- */
 public final class LocalPark258 {
     private static boolean entering;
 
@@ -23,7 +16,7 @@ public final class LocalPark258 {
             case 8: return 264;
             case 9: return 258;
             case 11: return 120;
-            case 13: return 300;
+            case 13: return 300; // spawn beside fisherman at x=326
             case 17: return 150;
             case 20: return 150;
             case 23: return 646;
@@ -42,7 +35,7 @@ public final class LocalPark258 {
             case 8: return 69;
             case 9: return 156;
             case 11: return 47;
-            case 13: return 64;
+            case 13: return 64; // same ground line as fisherman
             case 17: return 80;
             case 20: return 80;
             case 23: return 96;
@@ -51,6 +44,7 @@ public final class LocalPark258 {
     }
 
     private static hn createFisher() {
+        FishingClientParts258.prepare();
         hn npc = new hn();
         npc.a("tho.cau");
         npc.w = 2000000430;
@@ -105,6 +99,8 @@ public final class LocalPark258 {
             me.D = y;
             me.L = false;
             me.h();
+
+            try { offline.server.FishingProtocol.clientEnteredMap(map, zone, x, y); } catch (Throwable ignored) {}
 
             Vector users = new Vector();
             users.addElement(me);
