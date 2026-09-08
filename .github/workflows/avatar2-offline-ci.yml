@@ -1,0 +1,41 @@
+name: Avatar2 Offline CI
+
+on:
+  push:
+    branches:
+      - avatar2-offline
+      - avatar2-fishing
+    paths:
+      - 'Avatar2-Offline/**'
+      - '.github/workflows/avatar2-offline-ci.yml'
+  pull_request:
+    paths:
+      - 'Avatar2-Offline/**'
+      - '.github/workflows/avatar2-offline-ci.yml'
+  workflow_dispatch:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Secret scan
+        shell: bash
+        run: |
+          if [ -d Avatar2-Offline/server-src ]; then
+            python3 Avatar2-Offline/tools/secret_scan.py Avatar2-Offline/server-src
+          else
+            echo 'server-src not imported yet; skipping secret scan.'
+          fi
+
+      - name: Build server source
+        shell: bash
+        run: |
+          if [ -f Avatar2-Offline/server-src/pom.xml ]; then
+            cd Avatar2-Offline/server-src
+            mvn -B -DskipTests package
+          else
+            echo 'pom.xml not imported yet; skipping Maven build.'
+          fi
