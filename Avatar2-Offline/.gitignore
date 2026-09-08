@@ -1,0 +1,32 @@
+# Build outputs
+builds/
+target/
+*.class
+*.log
+
+# IDE/local
+.idea/
+*.iml
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Secrets/local configuration
+.env
+.env.*
+config.properties
+database.properties
+application-local.properties
+application-local.yml
+application-local.yaml
+
+# Raw imports and databases should not be committed to the public repo
+import/
+*.rar
+*.7z
+*.zip
+*.sql
+
+# Generated binaries
+*.jar
+*.apk
