@@ -19,24 +19,46 @@ importer = load("import_server_source", ROOT / "tools" / "import_server_source.p
 
 
 class FishingContractTest(unittest.TestCase):
-    def test_expected_fishing_maps(self):
-        self.assertEqual(contract.FISHING_MAPS, (13, 14, 15, 16))
-        self.assertTrue(all(contract.is_fishing_map(i) for i in range(13, 17)))
-        self.assertFalse(contract.is_fishing_map(12))
-        self.assertFalse(contract.is_fishing_map(17))
+    def test_expected_maps_and_fisher(self):
+        self.assertEqual(contract.FISHING_HUB_MAP, 13)
+        self.assertEqual(contract.FISHING_MAPS, (14, 15, 16))
+        self.assertEqual(contract.FISHER_BASE_ID, 430)
+        self.assertEqual(contract.FISHER_CLIENT_ID, 2000000430)
+        self.assertEqual(contract.FISHER_POSITION, (326, 64))
+        self.assertEqual(contract.FISHER_PARTS, (3387, 3386, 0, 82, 3385, 3384, 442))
+
+    def test_map_requirements_match_server(self):
+        self.assertEqual(contract.MAP_REQUIREMENTS[14], {"rods": (442, 445, 446), "ticket": 458, "bait": 443})
+        self.assertEqual(contract.MAP_REQUIREMENTS[15], {"rods": (445, 446), "ticket": 459, "bait": 447})
+        self.assertEqual(contract.MAP_REQUIREMENTS[16], {"rods": (446,), "ticket": 460, "bait": 448})
+
+    def test_fish_pool_weights_match_fish_helper(self):
+        self.assertEqual(sum(w for _, w in contract.FISH_POOLS[14]), 6)
+        self.assertEqual(sum(w for _, w in contract.FISH_POOLS[15]), 6)
+        self.assertEqual(sum(w for _, w in contract.FISH_POOLS[16]), 100)
+        self.assertEqual(dict(contract.FISH_POOLS[16])[457], 1)
+        self.assertEqual(contract.FISH_POINTS[457], 10)
+
+    def test_core_command_values_do_not_drift(self):
+        self.assertEqual(contract.COMMANDS["join_park"], 50)
+        self.assertEqual(contract.COMMANDS["cast_bait"], 82)
+        self.assertEqual(contract.COMMANDS["handle_fishing"], 84)
+        self.assertEqual(contract.COMMANDS["fishing_finished"], 85)
+        self.assertEqual(contract.COMMANDS["start_fishing"], 86)
+        self.assertEqual(contract.COMMANDS["fishing"], 91)
+
+    def test_shop_core_matches_server_database(self):
+        self.assertEqual(contract.SHOP_CORE[442], {"xu": 10000, "luong": 0, "days": 7})
+        self.assertEqual(contract.SHOP_CORE[445]["luong"], 25)
+        self.assertEqual(contract.SHOP_CORE[446]["luong"], 100)
+        self.assertEqual(contract.SHOP_CORE[458]["days"], 3)
+        self.assertEqual(contract.SHOP_CORE[459]["xu"], 10000)
+        self.assertEqual(contract.SHOP_CORE[460]["luong"], 2)
 
     def test_map_entry_preserves_requested_map(self):
         self.assertEqual(contract.parse_requested_map_and_zone(bytes([13, 2]), 9, 0), (13, 2))
         self.assertEqual(contract.parse_requested_map_and_zone(bytes([16, 255]), 9, 3), (16, 3))
         self.assertEqual(contract.parse_requested_map_and_zone(bytes([13]), 9, 3), (9, 3))
-
-    def test_core_command_values_do_not_drift(self):
-        self.assertEqual(contract.COMMANDS["join_park"], 50)
-        self.assertEqual(contract.COMMANDS["open_shop"], -49)
-        self.assertEqual(contract.COMMANDS["buy_item"], -24)
-        self.assertEqual(contract.COMMANDS["cast_bait"], 82)
-        self.assertEqual(contract.COMMANDS["start_fishing"], 86)
-        self.assertEqual(contract.COMMANDS["arrow_result"], 91)
 
     def test_import_filter_excludes_sensitive_and_binary_files(self):
         self.assertFalse(importer.is_allowed(Path("avatar.sql")))
