@@ -21,6 +21,13 @@ class LocalFisherSceneTest(unittest.TestCase):
         normalized = SOURCE.replace(" ", "")
         self.assertIn("newshort[]{3387,3386,0,82,3385,3384,442}", normalized)
 
+    def test_dynamic_parts_are_preloaded_before_entity_sort(self):
+        self.assertIn("FishingClientParts258.prepare()", SOURCE)
+        self.assertLess(SOURCE.index("FishingClientParts258.prepare()"), SOURCE.index("npc.h()"))
+
+    def test_local_map_is_synchronized_into_offline_fishing_state(self):
+        self.assertIn("FishingProtocol.clientEnteredMap(map, zone, x, y)", SOURCE)
+
     def test_map_13_spawns_player_beside_fisher_for_visibility(self):
         self.assertIn("case 13: return 300", SOURCE)
         self.assertIn("case 13: return 64", SOURCE)
