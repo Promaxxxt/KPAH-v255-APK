@@ -1,5 +1,9 @@
 import java.util.Vector;
 
+/**
+ * V122-style local park entry. Fishing UI is hooked separately through hr,
+ * exactly like LocalFarmHub258, so this class does not manufacture an NPC.
+ */
 public final class LocalPark258 {
     private static boolean entering;
 
@@ -16,7 +20,7 @@ public final class LocalPark258 {
             case 8: return 264;
             case 9: return 258;
             case 11: return 120;
-            case 13: return 300; // spawn beside fisherman at x=326
+            case 13: return 180;
             case 17: return 150;
             case 20: return 150;
             case 23: return 646;
@@ -35,31 +39,12 @@ public final class LocalPark258 {
             case 8: return 69;
             case 9: return 156;
             case 11: return 47;
-            case 13: return 64; // same ground line as fisherman
+            case 13: return 80;
             case 17: return 80;
             case 20: return 80;
             case 23: return 96;
             default: return 80;
         }
-    }
-
-    private static hn createFisher() {
-        FishingClientParts258.prepare();
-        hn npc = new hn();
-        npc.a("tho.cau");
-        npc.w = 2000000430;
-        npc.aw = 326;
-        npc.ax = 64;
-        npc.C = 326;
-        npc.D = 64;
-        npc.K = 0;
-        npc.t = 0;
-        short[] parts = new short[] {3387, 3386, 0, 82, 3385, 3384, 442};
-        for (int i = 0; i < parts.length; i++) {
-            npc.a(new hx(parts[i]));
-        }
-        npc.h();
-        return npc;
     }
 
     public static void enter(int requestedMap, int requestedZone) {
@@ -73,11 +58,7 @@ public final class LocalPark258 {
             } catch (Throwable ignored) {}
 
             hn me = main.GameMidlet.i;
-            if (me == null) {
-                entering = false;
-                try { main.a.h(); } catch (Throwable ignored) {}
-                return;
-            }
+            if (me == null) return;
 
             eo.a();
             main.GameMidlet.e = 9;
@@ -100,20 +81,12 @@ public final class LocalPark258 {
             me.L = false;
             me.h();
 
-            try { offline.server.FishingProtocol.clientEnteredMap(map, zone, x, y); } catch (Throwable ignored) {}
-
             Vector users = new Vector();
             users.addElement(me);
-            if (map == 13) {
-                users.addElement(createFisher());
-            }
             Vector v2 = new Vector();
             Vector v3 = new Vector();
-
             ae.b().a((byte) map, (byte) zone, (short) x, (short) y, users, v2, v3);
-            if (ir.m != null && !ir.m.contains(me)) {
-                ir.b(me);
-            }
+            if (ir.m != null && !ir.m.contains(me)) ir.b(me);
         } catch (Throwable ignored) {
         } finally {
             entering = false;
