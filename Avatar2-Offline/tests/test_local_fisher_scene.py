@@ -22,7 +22,7 @@ class FarmStyleFishingShopTest(unittest.TestCase):
 
     def test_shop_opens_directly_through_native_client_shop_screen(self):
         compact = HUB.replace(" ", "")
-        self.assertIn('ae.b().a((byte)0,10,"Câu cá",SHOP_IDS,-1,null)', compact)
+        self.assertIn('ae.b().a((byte)0,10,"Câucá",SHOP_IDS,-1,null)', compact)
         self.assertNotIn("cx.a().h(FISHER_NPC)", compact)
 
     def test_authoritative_fishing_shop_ids_are_preserved(self):
