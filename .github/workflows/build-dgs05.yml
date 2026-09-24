@@ -18,7 +18,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Setup Java
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: '17'
@@ -35,10 +35,16 @@ jobs:
       - name: Install Android SDK packages
         run: |
           set -euxo pipefail
-          SDK="${ANDROID_SDK_ROOT:-${ANDROID_HOME:-}}"
+          SDK="${ANDROID_SDK_ROOT:-${ANDROID_HOME:-/usr/local/lib/android/sdk}}"
           test -n "$SDK"
-          yes | sdkmanager --licenses >/dev/null 2>&1 || true
-          sdkmanager "platforms;android-34" "build-tools;34.0.0"
+          SDKMANAGER="$(find "$SDK/cmdline-tools" -type f -name sdkmanager 2>/dev/null | sort | tail -n 1)"
+          if [ -z "$SDKMANAGER" ]; then
+            echo "sdkmanager not found under $SDK"
+            find "$SDK" -maxdepth 5 -name sdkmanager -print || true
+            exit 1
+          fi
+          yes | "$SDKMANAGER" --sdk_root="$SDK" --licenses >/dev/null 2>&1 || true
+          "$SDKMANAGER" --sdk_root="$SDK" "platforms;android-34" "build-tools;34.0.0"
           test -f "$SDK/platforms/android-34/android.jar"
           test -x "$SDK/build-tools/34.0.0/aapt"
           test -x "$SDK/build-tools/34.0.0/d8"
@@ -48,15 +54,26 @@ jobs:
         run: |
           set -euxo pipefail
           rm -f dgs05/debug.keystore
-          keytool -genkeypair -noprompt             -keystore dgs05/debug.keystore             -storepass android             -keypass android             -alias dragon-debug             -keyalg RSA             -keysize 2048             -validity 10000             -dname "CN=Dragon Debug,O=Dragon9x,C=VN"
+          keytool -genkeypair -noprompt \
+            -keystore dgs05/debug.keystore \
+            -storepass android \
+            -keypass android \
+            -alias dragon-debug \
+            -keyalg RSA \
+            -keysize 2048 \
+            -validity 10000 \
+            -dname "CN=Dragon Debug,O=Dragon9x,C=VN"
 
       - name: Build APK
         run: |
           set -euxo pipefail
-          SDK="${ANDROID_SDK_ROOT:-${ANDROID_HOME:-}}"
+          SDK="${ANDROID_SDK_ROOT:-${ANDROID_HOME:-/usr/local/lib/android/sdk}}"
           cd dgs05
           chmod +x BUILD_APK.sh
-          ANDROID_SDK_ROOT="$SDK"           ANDROID_BUILD_TOOLS="$SDK/build-tools/34.0.0"           ANDROID_PLATFORM_JAR="$SDK/platforms/android-34/android.jar"           ./BUILD_APK.sh
+          ANDROID_SDK_ROOT="$SDK" \
+          ANDROID_BUILD_TOOLS="$SDK/build-tools/34.0.0" \
+          ANDROID_PLATFORM_JAR="$SDK/platforms/android-34/android.jar" \
+          ./BUILD_APK.sh
           test -s DragonGameStudio-0.5-debug.apk
           "$SDK/build-tools/34.0.0/apksigner" verify --verbose DragonGameStudio-0.5-debug.apk
 
