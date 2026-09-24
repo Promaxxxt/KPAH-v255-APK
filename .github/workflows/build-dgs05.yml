@@ -3,9 +3,10 @@ name: Build Dragon Game Studio 0.5 APK
 on:
   push:
     branches:
-      - dragon-game-studio-0.5-build
+      - dragon-game-studio-0.5-signed-fix
     paths:
       - dgs05-core.tar.gz.b64
+      - dragon-debug.keystore.b64
       - .github/workflows/build-dgs05.yml
   workflow_dispatch:
 
@@ -29,8 +30,13 @@ jobs:
           rm -rf dgs05
           mkdir -p dgs05
           base64 --decode dgs05-core.tar.gz.b64 | tar -xz -C dgs05
+          base64 --decode dragon-debug.keystore.b64 > dgs05/debug.keystore
           test -f dgs05/AndroidManifest.xml
           test -f dgs05/BUILD_APK.sh
+          test -s dgs05/debug.keystore
+          grep -q 'android:versionCode="5"' dgs05/AndroidManifest.xml
+          grep -q 'android:versionName="0.5"' dgs05/AndroidManifest.xml
+          keytool -list -v -keystore dgs05/debug.keystore -storepass android -alias dragon-debug | grep 'D2:46:7E:6E:D5:B4:B8:15:C6:05:C8:67:06:60:E2:87:49:4C:8E:85:56:F9:3F:24:93:2C:B7:57:17:F3:0E:93'
 
       - name: Install Android SDK packages
         run: |
@@ -50,21 +56,7 @@ jobs:
           test -x "$SDK/build-tools/34.0.0/d8"
           test -x "$SDK/build-tools/34.0.0/apksigner"
 
-      - name: Create debug signing key
-        run: |
-          set -euxo pipefail
-          rm -f dgs05/debug.keystore
-          keytool -genkeypair -noprompt \
-            -keystore dgs05/debug.keystore \
-            -storepass android \
-            -keypass android \
-            -alias dragon-debug \
-            -keyalg RSA \
-            -keysize 2048 \
-            -validity 10000 \
-            -dname "CN=Dragon Debug,O=Dragon9x,C=VN"
-
-      - name: Build APK
+      - name: Build APK with original signature
         run: |
           set -euxo pipefail
           SDK="${ANDROID_SDK_ROOT:-${ANDROID_HOME:-/usr/local/lib/android/sdk}}"
@@ -75,12 +67,13 @@ jobs:
           ANDROID_PLATFORM_JAR="$SDK/platforms/android-34/android.jar" \
           ./BUILD_APK.sh
           test -s DragonGameStudio-0.5-debug.apk
-          "$SDK/build-tools/34.0.0/apksigner" verify --verbose DragonGameStudio-0.5-debug.apk
+          "$SDK/build-tools/34.0.0/apksigner" verify --verbose --print-certs DragonGameStudio-0.5-debug.apk | tee certs.txt
+          grep -q 'D2:46:7E:6E:D5:B4:B8:15:C6:05:C8:67:06:60:E2:87:49:4C:8E:85:56:F9:3F:24:93:2C:B7:57:17:F3:0E:93' certs.txt
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: DragonGameStudio-0.5-debug-apk
+          name: DragonGameStudio-0.5-original-signature
           path: dgs05/DragonGameStudio-0.5-debug.apk
           if-no-files-found: error
           retention-days: 7
