@@ -1,0 +1,69 @@
+name: Build Dragon Game Studio 0.5 APK
+
+on:
+  push:
+    branches:
+      - dragon-game-studio-0.5-build
+    paths:
+      - dgs05-core.tar.gz.b64
+      - .github/workflows/build-dgs05.yml
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Restore Dragon Game Studio source
+        run: |
+          set -euxo pipefail
+          rm -rf dgs05
+          mkdir -p dgs05
+          base64 --decode dgs05-core.tar.gz.b64 | tar -xz -C dgs05
+          test -f dgs05/AndroidManifest.xml
+          test -f dgs05/BUILD_APK.sh
+
+      - name: Install Android SDK packages
+        run: |
+          set -euxo pipefail
+          SDK="${ANDROID_SDK_ROOT:-${ANDROID_HOME:-}}"
+          test -n "$SDK"
+          yes | sdkmanager --licenses >/dev/null 2>&1 || true
+          sdkmanager "platforms;android-34" "build-tools;34.0.0"
+          test -f "$SDK/platforms/android-34/android.jar"
+          test -x "$SDK/build-tools/34.0.0/aapt"
+          test -x "$SDK/build-tools/34.0.0/d8"
+          test -x "$SDK/build-tools/34.0.0/apksigner"
+
+      - name: Create debug signing key
+        run: |
+          set -euxo pipefail
+          rm -f dgs05/debug.keystore
+          keytool -genkeypair -noprompt             -keystore dgs05/debug.keystore             -storepass android             -keypass android             -alias dragon-debug             -keyalg RSA             -keysize 2048             -validity 10000             -dname "CN=Dragon Debug,O=Dragon9x,C=VN"
+
+      - name: Build APK
+        run: |
+          set -euxo pipefail
+          SDK="${ANDROID_SDK_ROOT:-${ANDROID_HOME:-}}"
+          cd dgs05
+          chmod +x BUILD_APK.sh
+          ANDROID_SDK_ROOT="$SDK"           ANDROID_BUILD_TOOLS="$SDK/build-tools/34.0.0"           ANDROID_PLATFORM_JAR="$SDK/platforms/android-34/android.jar"           ./BUILD_APK.sh
+          test -s DragonGameStudio-0.5-debug.apk
+          "$SDK/build-tools/34.0.0/apksigner" verify --verbose DragonGameStudio-0.5-debug.apk
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: DragonGameStudio-0.5-debug-apk
+          path: dgs05/DragonGameStudio-0.5-debug.apk
+          if-no-files-found: error
+          retention-days: 7
