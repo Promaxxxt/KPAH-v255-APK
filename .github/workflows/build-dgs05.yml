@@ -1,10 +1,11 @@
-name: Build Dragon Game Studio 0.5 APK
+name: Build Dragon Game Studio 0.6 APK
 
 on:
   push:
     branches:
-      - dragon-game-studio-0.5-signed-fix
+      - dragon-game-studio-0.6-build
     paths:
+      - dgs06.patch
       - dgs05-core.tar.gz.b64
       - dragon-debug.keystore.b64
       - .github/workflows/build-dgs05.yml
@@ -24,56 +25,51 @@ jobs:
           distribution: temurin
           java-version: '17'
 
-      - name: Restore Dragon Game Studio source
+      - name: Restore 0.5 base and apply 0.6 patch
         run: |
           set -euxo pipefail
-          rm -rf dgs05
-          mkdir -p dgs05
-          base64 --decode dgs05-core.tar.gz.b64 | tar -xz -C dgs05
-          base64 --decode dragon-debug.keystore.b64 > dgs05/debug.keystore
-          test -f dgs05/AndroidManifest.xml
-          test -f dgs05/BUILD_APK.sh
-          test -s dgs05/debug.keystore
-          grep -q 'android:versionCode="5"' dgs05/AndroidManifest.xml
-          grep -q 'android:versionName="0.5"' dgs05/AndroidManifest.xml
-          keytool -list -v -keystore dgs05/debug.keystore -storepass android -alias dragon-debug | grep 'D2:46:7E:6E:D5:B4:B8:15:C6:05:C8:67:06:60:E2:87:49:4C:8E:85:56:F9:3F:24:93:2C:B7:57:17:F3:0E:93'
+          rm -rf dgs06
+          mkdir -p dgs06
+          base64 --decode dgs05-core.tar.gz.b64 | tar -xz -C dgs06
+          cd dgs06
+          patch -p1 < ../dgs06.patch
+          cd ..
+          base64 --decode dragon-debug.keystore.b64 > dgs06/debug.keystore
+          test -f dgs06/src/com/dragon9x/gamestudio/SkillEffect.java
+          test -f dgs06/src/com/dragon9x/gamestudio/TilePaletteView.java
+          test -f dgs06/src/com/dragon9x/gamestudio/ImageCropView.java
+          test -f dgs06/src/com/dragon9x/gamestudio/EffectPreviewView.java
+          grep -q 'android:versionCode="6"' dgs06/AndroidManifest.xml
+          grep -q 'android:versionName="0.6"' dgs06/AndroidManifest.xml
+          keytool -list -v -keystore dgs06/debug.keystore -storepass android -alias dragon-debug | grep 'D2:46:7E:6E:D5:B4:B8:15:C6:05:C8:67:06:60:E2:87:49:4C:8E:85:56:F9:3F:24:93:2C:B7:57:17:F3:0E:93'
 
       - name: Install Android SDK packages
         run: |
           set -euxo pipefail
           SDK="${ANDROID_SDK_ROOT:-${ANDROID_HOME:-/usr/local/lib/android/sdk}}"
-          test -n "$SDK"
           SDKMANAGER="$(find "$SDK/cmdline-tools" -type f -name sdkmanager 2>/dev/null | sort | tail -n 1)"
-          if [ -z "$SDKMANAGER" ]; then
-            echo "sdkmanager not found under $SDK"
-            find "$SDK" -maxdepth 5 -name sdkmanager -print || true
-            exit 1
-          fi
+          test -n "$SDKMANAGER"
           yes | "$SDKMANAGER" --sdk_root="$SDK" --licenses >/dev/null 2>&1 || true
           "$SDKMANAGER" --sdk_root="$SDK" "platforms;android-34" "build-tools;34.0.0"
-          test -f "$SDK/platforms/android-34/android.jar"
-          test -x "$SDK/build-tools/34.0.0/aapt"
-          test -x "$SDK/build-tools/34.0.0/d8"
-          test -x "$SDK/build-tools/34.0.0/apksigner"
 
       - name: Build APK with original signature
         run: |
           set -euxo pipefail
           SDK="${ANDROID_SDK_ROOT:-${ANDROID_HOME:-/usr/local/lib/android/sdk}}"
-          cd dgs05
+          cd dgs06
           chmod +x BUILD_APK.sh
           ANDROID_SDK_ROOT="$SDK" \
           ANDROID_BUILD_TOOLS="$SDK/build-tools/34.0.0" \
           ANDROID_PLATFORM_JAR="$SDK/platforms/android-34/android.jar" \
           ./BUILD_APK.sh
-          test -s DragonGameStudio-0.5-debug.apk
-          "$SDK/build-tools/34.0.0/apksigner" verify --verbose --print-certs DragonGameStudio-0.5-debug.apk | tee certs.txt
+          test -s DragonGameStudio-0.6-debug.apk
+          "$SDK/build-tools/34.0.0/apksigner" verify --verbose --print-certs DragonGameStudio-0.6-debug.apk | tee certs.txt
           grep -q 'd2467e6ed5b4b815c605c8670660e287494c8e8556f93f24932cb75717f30e93' certs.txt
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: DragonGameStudio-0.5-original-signature
-          path: dgs05/DragonGameStudio-0.5-debug.apk
+          name: DragonGameStudio-0.6-original-signature
+          path: dgs06/DragonGameStudio-0.6-debug.apk
           if-no-files-found: error
           retention-days: 7
