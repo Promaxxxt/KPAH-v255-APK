@@ -68,7 +68,7 @@ jobs:
           ./BUILD_APK.sh
           test -s DragonGameStudio-0.5-debug.apk
           "$SDK/build-tools/34.0.0/apksigner" verify --verbose --print-certs DragonGameStudio-0.5-debug.apk | tee certs.txt
-          grep -q 'D2:46:7E:6E:D5:B4:B8:15:C6:05:C8:67:06:60:E2:87:49:4C:8E:85:56:F9:3F:24:93:2C:B7:57:17:F3:0E:93' certs.txt
+          grep -q 'd2467e6ed5b4b815c605c8670660e287494c8e8556f93f24932cb75717f30e93' certs.txt
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
