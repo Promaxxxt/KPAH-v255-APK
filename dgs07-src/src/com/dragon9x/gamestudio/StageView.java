@@ -412,7 +412,7 @@ messageUntil=System.currentTimeMillis()+900;
 invalidate();
 return;
 }
-useSkill(skill,"skill"+(slot+1));
+useSkill(skill,project.quickActionKeys[slot]);
 }
 
  void useSkill(Skill skill,String characterAction){
