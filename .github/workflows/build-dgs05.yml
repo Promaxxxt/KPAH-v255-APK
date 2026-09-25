@@ -1,11 +1,11 @@
-name: Build Dragon Game Studio 0.8 APK
+name: Build Dragon Game Studio 0.9 APK
 
 on:
   push:
     branches:
-      - dragon-game-studio-0.8-build
+      - dragon-game-studio-0.9-build
     paths:
-      - dgs08-source.tar.gz.b64
+      - dgs09-source.tar.gz.b64
       - .github/workflows/build-dgs05.yml
   workflow_dispatch:
 
@@ -23,17 +23,17 @@ jobs:
           distribution: temurin
           java-version: '17'
 
-      - name: Restore Dragon Game Studio 0.8 source
+      - name: Restore Dragon Game Studio 0.9 source
         run: |
           set -euxo pipefail
-          rm -rf dgs08
-          mkdir -p dgs08
-          base64 --decode dgs08-source.tar.gz.b64 | tar -xz -C dgs08
-          test -f dgs08/src/com/dragon9x/gamestudio/GameCodeBundle.java
-          test -f dgs08/HUONG_DAN_CODE_GAME_0.8.txt
-          grep -q 'android:versionCode="8"' dgs08/AndroidManifest.xml
-          grep -q 'android:versionName="0.8"' dgs08/AndroidManifest.xml
-          keytool -list -v -keystore dgs08/debug.keystore -storepass android -alias dragon-debug | grep 'D2:46:7E:6E:D5:B4:B8:15:C6:05:C8:67:06:60:E2:87:49:4C:8E:85:56:F9:3F:24:93:2C:B7:57:17:F3:0E:93'
+          rm -rf dgs09
+          mkdir -p dgs09
+          base64 --decode dgs09-source.tar.gz.b64 | tar -xz -C dgs09
+          test -f dgs09/src/com/dragon9x/gamestudio/SkillPhase.java
+          test -f dgs09/HUONG_DAN_NHAN_VAT_SKILL_0.9.txt
+          grep -q 'android:versionCode="9"' dgs09/AndroidManifest.xml
+          grep -q 'android:versionName="0.9"' dgs09/AndroidManifest.xml
+          keytool -list -v -keystore dgs09/debug.keystore -storepass android -alias dragon-debug | grep 'D2:46:7E:6E:D5:B4:B8:15:C6:05:C8:67:06:60:E2:87:49:4C:8E:85:56:F9:3F:24:93:2C:B7:57:17:F3:0E:93'
 
       - name: Install Android SDK packages
         run: |
@@ -48,20 +48,17 @@ jobs:
         run: |
           set -euxo pipefail
           SDK="${ANDROID_SDK_ROOT:-${ANDROID_HOME:-/usr/local/lib/android/sdk}}"
-          cd dgs08
+          cd dgs09
           chmod +x BUILD_APK.sh
-          ANDROID_SDK_ROOT="$SDK" \
-          ANDROID_BUILD_TOOLS="$SDK/build-tools/34.0.0" \
-          ANDROID_PLATFORM_JAR="$SDK/platforms/android-34/android.jar" \
-          ./BUILD_APK.sh
-          test -s DragonGameStudio-0.8-debug.apk
-          "$SDK/build-tools/34.0.0/apksigner" verify --verbose --print-certs DragonGameStudio-0.8-debug.apk | tee certs.txt
+          ANDROID_SDK_ROOT="$SDK"           ANDROID_BUILD_TOOLS="$SDK/build-tools/34.0.0"           ANDROID_PLATFORM_JAR="$SDK/platforms/android-34/android.jar"           ./BUILD_APK.sh
+          test -s DragonGameStudio-0.9-debug.apk
+          "$SDK/build-tools/34.0.0/apksigner" verify --verbose --print-certs DragonGameStudio-0.9-debug.apk | tee certs.txt
           grep -q 'd2467e6ed5b4b815c605c8670660e287494c8e8556f93f24932cb75717f30e93' certs.txt
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: DragonGameStudio-0.8-original-signature
-          path: dgs08/DragonGameStudio-0.8-debug.apk
+          name: DragonGameStudio-0.9-original-signature
+          path: dgs09/DragonGameStudio-0.9-debug.apk
           if-no-files-found: error
           retention-days: 7
