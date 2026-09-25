@@ -1,0 +1,31 @@
+DRAGON GAME STUDIO 0.7 — NHÂN VẬT + ANIMATION + NÚT SKILL NHANH
+
+1. TAB NHÂN VẬT
+- Mỗi động tác lưu một ảnh frame riêng trong thư mục characters/.
+- Các động tác có sẵn: Đứng, Chạy, Đấm, Đá, Chém, Nhảy, Bay, Tung skill 1 đến Tung skill 9.
+- Mỗi động tác có thể dùng kích thước frame, số frame và tốc độ frame khác nhau.
+- Ví dụ: Đứng 2 frame, Chạy 4 frame, Chém 6 frame, Skill 1 có 12 frame.
+- Có thể nhập ảnh, chọn vùng cắt, thu/phóng, xoay 90 độ, lật ngang, lật dọc và chạy thử frame trước khi lưu.
+
+2. JOYSTICK VÀ TRẠNG THÁI TỰ ĐỘNG
+- Không chạm joystick: dùng animation Đứng.
+- Có hướng di chuyển: dùng animation Chạy.
+- Nhảy: dùng animation Nhảy.
+- Bay: dùng animation Bay.
+- Hướng sang trái sẽ tự lật sprite theo chiều ngang khi chạy game.
+
+3. NÚT ĐÁNH THƯỜNG
+- Trong Thiết lập nút có thể chọn Đấm, Đá hoặc Chém cho nút Đánh.
+- Nút Đánh vẫn dùng skill đang test làm thông số damage/range/cooldown, còn animation lấy theo Đấm/Đá/Chém đã chọn.
+
+4. NÚT SKILL NHANH S1–S9
+- Màn chạy game có 9 nút S1 đến S9.
+- Mỗi nút gán độc lập một skill trong danh sách Skill.
+- S1 dùng animation Tung skill 1, S2 dùng Tung skill 2 ... S9 dùng Tung skill 9.
+- Skill thật vẫn giữ damage, range, cooldown và effect riêng.
+- Vì vậy có thể đổi skill trên nút mà không phải làm lại animation nhân vật.
+
+5. FILE DỰ ÁN
+- Metadata animation nằm trong project.json.
+- Ảnh động tác nằm tại characters/player_stand.png, player_run.png, player_punch.png ... player_skill9.png.
+- Khi xuất .dgproject, toàn bộ thư mục characters/ được đóng gói cùng map, effect và code GSC.
