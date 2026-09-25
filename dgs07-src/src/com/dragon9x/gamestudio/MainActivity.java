@@ -750,6 +750,7 @@ GameProject draft=GameProject.fromJson(project.json().toString());
 if(!adding)draft.skills.removeIf(item->item.id==original.id);
 draft.skills.add(s);
 if(!adding&&draft.activeSkillId==original.id)draft.activeSkillId=s.id;
+if(!adding&&original.id!=s.id)for(int i=0;i<draft.quickSkillIds.length;i++)if(draft.quickSkillIds[i]==original.id)draft.quickSkillIds[i]=s.id;
 draft.validate();
 project=draft;
 store.save(project);
@@ -952,14 +953,20 @@ catch(Exception e){error(e);}
  void controlSetupDialog(){
 LinearLayout panel=new LinearLayout(this);
 panel.setOrientation(LinearLayout.VERTICAL);
-panel.addView(text("Joystick: tự chuyển Đứng khi không chạm và Chạy khi đang di chuyển. Nhảy/Bay tự gọi animation tương ứng. Nút skill S1–S9 dùng animation skill1–skill9; bên dưới chọn skill thật cho từng nút.",11,Color.DKGRAY));
+panel.addView(text("Joystick tự chuyển Đứng/Chạy; Nhảy/Bay tự dùng frame tương ứng. Nút Đánh chọn Đấm/Đá/Chém. Với S1–S9, anh chọn cả skill thật và bộ frame nhân vật sẽ chạy khi bấm nút.",11,Color.DKGRAY));
 Spinner basic=new Spinner(this);
 String[] basicLabels={"Đấm","Đá","Chém"};
 String[] basicKeys={"punch","kick","slash"};
 ArrayAdapter<String> ba=new ArrayAdapter<>(this,android.R.layout.simple_spinner_item,basicLabels);ba.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);basic.setAdapter(ba);
 int basicSel=project.basicAction.equals("kick")?1:project.basicAction.equals("slash")?2:0;basic.setSelection(basicSel);
 row(panel,"Nút Đánh",basic);
-final Spinner[] slots=new Spinner[9];
+final Spinner[] slots=new Spinner[9],animations=new Spinner[9];
+ArrayList<String> actionKeys=new ArrayList<>(),actionLabels=new ArrayList<>();
+for(int i=0;i<CharacterAction.KEYS.length;i++){
+String key=CharacterAction.KEYS[i];
+if(key.equals("stand")||key.equals("run")||key.equals("jump")||key.equals("fly"))continue;
+actionKeys.add(key);actionLabels.add(CharacterAction.LABELS[i]);
+}
 for(int slot=0;slot<9;slot++){
 Spinner sp=new Spinner(this);
 ArrayAdapter<String> a=new ArrayAdapter<>(this,android.R.layout.simple_spinner_item);a.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -970,7 +977,13 @@ Skill skill=project.skills.get(i);a.add("#"+skill.id+" • "+skill.name);
 if(skill.id==project.quickSkillIds[slot])selected=i+1;
 }
 sp.setAdapter(a);sp.setSelection(selected);slots[slot]=sp;
-row(panel,"Nút S"+(slot+1),sp);
+row(panel,"S"+(slot+1)+" • Skill",sp);
+Spinner anim=new Spinner(this);
+ArrayAdapter<String> aa=new ArrayAdapter<>(this,android.R.layout.simple_spinner_item,actionLabels);aa.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);anim.setAdapter(aa);
+int actionSelected=actionKeys.indexOf(project.quickActionKeys[slot]);
+if(actionSelected<0)actionSelected=Math.max(0,actionKeys.indexOf("skill"+(slot+1)));
+anim.setSelection(actionSelected);animations[slot]=anim;
+row(panel,"S"+(slot+1)+" • Frame",anim);
 }
 ScrollView scroll=new ScrollView(this);scroll.addView(panel);
 new AlertDialog.Builder(this).setTitle("Thiết lập điều khiển nhân vật").setView(scroll).setNegativeButton("Hủy",null).setPositiveButton("Lưu",(d,w)->{
@@ -980,10 +993,11 @@ next.basicAction=basicKeys[basic.getSelectedItemPosition()];
 for(int slot=0;slot<9;slot++){
 int pos=slots[slot].getSelectedItemPosition();
 next.quickSkillIds[slot]=pos==0?0:next.skills.get(pos-1).id;
+next.quickActionKeys[slot]=actionKeys.get(animations[slot].getSelectedItemPosition());
 }
 next.validate();project=next;store.save(project);reloadImages();
 if(charactersPage!=null)refreshCharacters();
-status.setText("Đã lưu bố trí nút Đánh + S1–S9");
+status.setText("Đã lưu nút Đánh + skill + frame cho S1–S9");
 }
 catch(Exception e){error(e);}
 }).show();
@@ -1323,7 +1337,7 @@ bar.addView(row);
 playPage.addView(bar);
 playStage=new StageView(this);
 playPage.addView(playStage,new LinearLayout.LayoutParams(-1,0,1));
-playPage.addView(text("Joystick tự dùng frame Đứng/Chạy. Nút Đánh dùng Đấm/Đá/Chém theo thiết lập. S1–S9 gọi skill đã gán và animation skill1–skill9 tương ứng.",11,Color.DKGRAY));
+playPage.addView(text("Joystick tự dùng frame Đứng/Chạy. Nút Đánh dùng Đấm/Đá/Chém theo thiết lập. S1–S9 gọi skill và bộ frame đã gán riêng trong menu Thiết lập nút.",11,Color.DKGRAY));
 }
 
  void refreshProject(){
