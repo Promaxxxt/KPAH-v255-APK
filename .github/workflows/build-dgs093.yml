@@ -1,0 +1,26 @@
+name: Build DGS 0.9.3
+on:
+  push:
+    branches: [dragon-game-studio-0.9.3-build]
+    paths:
+      - dgs093-source.zip.b64
+      - ci-build-dgs093.sh
+      - .github/workflows/build-dgs093.yml
+  workflow_dispatch:
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+      - run: bash ci-build-dgs093.sh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: DragonGameStudio-0.9.3-original-signature
+          path: dgs093/DragonGameStudio-0.9.3-debug.apk
+          if-no-files-found: error
+          retention-days: 7
