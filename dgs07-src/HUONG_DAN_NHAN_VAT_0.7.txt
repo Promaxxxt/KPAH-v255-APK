@@ -21,9 +21,9 @@ DRAGON GAME STUDIO 0.7 — NHÂN VẬT + ANIMATION + NÚT SKILL NHANH
 4. NÚT SKILL NHANH S1–S9
 - Màn chạy game có 9 nút S1 đến S9.
 - Mỗi nút gán độc lập một skill trong danh sách Skill.
-- S1 dùng animation Tung skill 1, S2 dùng Tung skill 2 ... S9 dùng Tung skill 9.
+- Mỗi nút chọn được cả skill thật và bộ frame nhân vật riêng. Mặc định S1→Tung skill 1, S2→Tung skill 2 ... S9→Tung skill 9, nhưng có thể đổi chéo hoặc dùng Đấm/Đá/Chém.
 - Skill thật vẫn giữ damage, range, cooldown và effect riêng.
-- Vì vậy có thể đổi skill trên nút mà không phải làm lại animation nhân vật.
+- Vì vậy có thể đổi skill hoặc animation của nút độc lập mà không phải làm lại phần còn lại.
 
 5. FILE DỰ ÁN
 - Metadata animation nằm trong project.json.
