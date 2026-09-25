@@ -1,0 +1,366 @@
+DRAGON GAME STUDIO 0.6 — HƯỚNG DẪN ENGINE GSC
+================================================
+
+GSC là ngôn ngữ script an toàn của xưởng game. Mỗi lệnh nằm trên một dòng.
+Không phải Java. Script được kiểm tra trước khi lưu/chạy.
+
+1. CÚ PHÁP CƠ BẢN
+-----------------
+Dạng thường:
+  su_kien: lenh tham_so
+
+Ví dụ:
+  on_start: message Xin chào
+  on_kill: heal 20
+  on_menu: teleport 200 120
+
+Dòng chú thích bắt đầu bằng # hoặc //:
+  # Đây là chú thích
+
+2. IF / THEN / ELSE
+-------------------
+Dạng:
+  su_kien: if dieu_kien then lenh
+
+Có else:
+  su_kien: if dieu_kien then lenh else lenh
+
+Ví dụ:
+  on_hit: if hp <= 30 then heal 20
+  on_attack: if mp >= 10 then mp_sub 10 else message Không đủ MP
+  on_menu: if gold >= 100 then gold_sub 100 else message Thiếu vàng
+
+Toán tử so sánh:
+  ==   bằng
+  !=   khác
+  >    lớn hơn
+  >=   lớn hơn hoặc bằng
+  <    nhỏ hơn
+  <=   nhỏ hơn hoặc bằng
+
+Kết hợp nhiều điều kiện bằng and / or:
+  on_attack: if mp >= 10 and status:stun == 0 then mp_sub 10
+  on_hit: if hp_percent <= 25 or mp == 0 then message Nguy hiểm
+
+GSC 0.6 chưa dùng dấu ngoặc trong biểu thức. AND được nhóm trong từng vế OR.
+
+3. SỰ KIỆN
+-----------
+  on_start       Chạy khi bắt đầu Chạy thử.
+  on_attack      Sau khi nhân vật đánh trúng mục tiêu.
+  on_hit         Khi nhân vật bị quái đánh.
+  on_kill        Khi mục tiêu vừa bị hạ.
+  on_menu        Khi chọn/chạy hành động menu của class.
+  on_tick        Mỗi khoảng 1 giây trong Chạy thử.
+  on_move        Khi nhân vật đang di chuyển, giới hạn khoảng 4 lần/giây.
+  on_jump        Khi bắt đầu nhảy.
+  on_land        Khi rơi xuống đất sau nhảy/bay.
+  on_fly         Khi bắt đầu bay.
+  on_mp_empty    Khi MP vừa giảm về 0.
+  on_death       Khi HP vừa giảm về 0.
+
+4. BIẾN DÙNG TRONG IF
+---------------------
+  hp                 HP hiện tại
+  max_hp             HP tối đa hiện tại
+  hp_percent         % HP hiện tại, 0..100
+  mp                 MP hiện tại
+  max_mp             MP tối đa hiện tại
+  mp_percent         % MP hiện tại, 0..100
+  gold               vàng hiện tại
+  exp                EXP hiện tại
+  level              cấp hiện tại
+  x / y              tọa độ nhân vật
+  speed              tốc độ di chuyển
+  enemy_hp           HP mục tiêu hiện tại/gần nhất
+  enemy_count        số quái còn sống
+  enemy_alive        1 nếu còn quái, 0 nếu hết
+  flying             1 nếu đang bay, 0 nếu không
+  grounded           1 nếu đang đứng đất, 0 nếu đang trên không
+  last_crit          1 nếu đòn vừa rồi chí mạng
+  attack_bonus       sát thương cộng thêm
+  attack_multiplier  hệ số sát thương %, mặc định 100
+  defense            thủ phẳng
+  damage_reduction   giảm sát thương %, 0..100
+  random             số ngẫu nhiên 1..100 mỗi lần kiểm tra
+
+Biến tự tạo:
+  var:ten_bien
+Ví dụ:
+  on_start: set quest 0
+  on_kill: add quest 1
+  on_kill: if var:quest >= 10 then message Đã đủ 10 quái
+
+Kiểm tra vật phẩm:
+  item:id_vat_pham
+Ví dụ:
+  on_menu: if item:ve_dao >= 1 then item_remove ve_dao 1 else message Thiếu vé
+
+Kiểm tra trạng thái:
+  status:ten_trang_thai
+Ví dụ:
+  on_hit: if status:invincible == 0 then message Đã trúng đòn
+
+5. HIỂN THỊ
+-----------
+message NOI_DUNG
+  Hiện thông báo khoảng 3,2 giây.
+  Có biến thay thế: {hp} {max_hp} {mp} {max_mp} {gold} {exp} {level} {x} {y} {enemy_hp}
+
+Ví dụ:
+  on_tick: message HP {hp}/{max_hp} - MP {mp}/{max_mp}
+
+6. HP / MP
+----------
+heal N
+  Hồi N HP.
+
+heal_percent N
+  Hồi N% HP tối đa.
+
+damage N
+  Gây thêm N sát thương lên mục tiêu của sự kiện.
+
+damage_percent N
+  Trừ N% HP hiện tại của mục tiêu.
+
+enemy_heal N
+  Hồi HP cho mục tiêu.
+
+set_hp N
+  Đặt HP hiện tại.
+
+set_enemy_hp N
+  Đặt HP mục tiêu.
+
+set_max_hp N
+  Đổi HP tối đa trong lượt chạy thử.
+
+mp_add N
+  Hồi N MP.
+
+mp_add_percent N
+  Hồi N% MP tối đa.
+
+mp_sub N
+  Trừ N MP. Khi về 0 sẽ gọi on_mp_empty.
+
+set_mp N
+  Đặt MP hiện tại.
+
+set_max_mp N
+  Đổi MP tối đa.
+
+revive N
+  Nếu đã chết, hồi sinh với tối đa N HP.
+
+Ví dụ kỹ năng tốn MP:
+  on_attack: if mp >= 15 then mp_sub 15 else message Không đủ MP
+
+7. DI CHUYỂN / VẬT LÝ
+---------------------
+speed N
+  Đặt tốc độ px/giây.
+
+speed_add N
+  Cộng tốc độ.
+
+speed_sub N
+  Trừ tốc độ.
+
+teleport X Y
+  Dịch chuyển trong map hiện tại đến tọa độ X,Y.
+
+gravity N
+  Đặt gia tốc trọng lực, 0..5000. Mặc định lấy từ cấu hình dự án.
+
+jump N
+  Nhảy với lực N. Khoảng 300–600 dễ quan sát trong preview.
+
+fly on
+fly off
+fly toggle
+  Bật/tắt bay.
+
+fly_cost N
+  Đặt lượng MP tiêu hao mỗi giây khi bay.
+
+Ví dụ:
+  on_menu: jump 420
+  on_fly: message Bắt đầu bay
+  on_tick: if flying == 1 and mp <= 5 then fly off
+
+8. QUÁI
+-------
+spawn N
+  Sinh thêm N quái quanh vị trí quái mẫu. Một lệnh tối đa 20, preview tối đa 60 quái.
+
+Ví dụ:
+  on_kill: if enemy_count <= 2 then spawn 5
+
+9. VÀNG / EXP / LEVEL
+---------------------
+gold_add N
+  Cộng vàng.
+
+gold_sub N
+  Trừ vàng, không xuống dưới 0.
+
+exp_add N
+  Cộng EXP.
+
+level_set N
+  Đặt cấp.
+
+level_add N
+  Cộng/trừ cấp nhưng tối thiểu là 1.
+
+Ví dụ shop đơn giản:
+  on_menu: if gold >= 100 then gold_sub 100 else message Không đủ vàng
+
+10. BIẾN TÙY Ý
+---------------
+set TEN N
+  Gán biến.
+
+add TEN N
+  Cộng vào biến.
+
+sub TEN N
+  Trừ biến.
+
+random_set TEN MIN MAX
+  Gán số ngẫu nhiên MIN..MAX.
+
+Tên biến phải bắt đầu bằng chữ và chỉ gồm chữ, số, _.
+
+Ví dụ:
+  on_start: set combo 0
+  on_attack: add combo 1
+  on_hit: set combo 0
+  on_attack: if var:combo >= 5 then damage 50
+
+11. VẬT PHẨM / HÀNH TRANG SCRIPT
+--------------------------------
+item_add ID SO_LUONG
+  Thêm item script.
+
+item_remove ID SO_LUONG
+  Bớt item script, không âm.
+
+item_clear
+  Xóa toàn bộ item script của lượt chạy thử.
+
+Ví dụ:
+  on_kill: item_add da_quy 1
+  on_menu: if item:da_quy >= 5 then item_remove da_quy 5 else message Cần 5 đá quý
+
+Lưu ý: đây là hành trang logic của preview GSC; chưa phải UI túi đồ MMORPG hoàn chỉnh.
+
+12. TRẠNG THÁI / BUFF / DEBUFF
+------------------------------
+status_add TEN THOI_GIAN_MS
+  Thêm trạng thái trong số mili-giây đã cho.
+
+status_remove TEN
+  Xóa một trạng thái.
+
+status_clear
+  Xóa toàn bộ trạng thái.
+
+Tên trạng thái đặc biệt engine hiểu trực tiếp:
+  stun         không đi và không đánh được
+  root         không di chuyển được
+  silence      không đánh/kích hoạt skill được
+  invincible   không nhận đòn đánh thường từ quái
+
+Tên khác vẫn được lưu để dùng trong điều kiện status:TEN.
+
+Ví dụ:
+  on_hit: if random <= 20 then status_add stun 1500
+  on_tick: if status:stun == 1 then message Đang choáng
+
+13. CHIẾN ĐẤU NÂNG CAO
+----------------------
+attack_bonus N
+  Cộng N sát thương vào damage của skill đang dùng.
+
+attack_multiplier N
+  Nhân tổng sát thương theo %, mặc định 100.
+
+crit_chance N
+  Tỷ lệ chí mạng 0..100%.
+
+crit_damage N
+  Sát thương chí mạng theo %, mặc định 150.
+
+lifesteal N
+  Hút N% sát thương thực gây ra thành HP.
+
+defense N
+  Giảm phẳng sát thương quái gây lên người chơi.
+
+damage_reduction N
+  Giảm tiếp N% sát thương sau defense.
+
+Ví dụ build nhân vật:
+  on_start: attack_bonus 30
+  on_start: attack_multiplier 120
+  on_start: crit_chance 25
+  on_start: crit_damage 200
+  on_start: lifesteal 10
+  on_start: defense 3
+  on_start: damage_reduction 15
+  on_attack: if last_crit == 1 then message CHÍ MẠNG!
+
+14. MẪU CLASS GSC CÓ MENU
+-------------------------
+class KyNangBay
+menu Bật / tắt bay
+screen Kỹ năng bay
+text Bay tiêu hao MP mỗi giây. Hết MP sẽ tự hạ xuống.
+on_menu: fly toggle
+on_menu: message Trạng thái bay đã đổi
+on_mp_empty: fly off
+on_mp_empty: message Hết MP, tự hạ xuống
+
+15. MẪU HỆ THỐNG NHIỆM VỤ
+-------------------------
+class NhiemVuQuai
+menu Xem nhiệm vụ
+on_start: set quest_kill 0
+on_kill: add quest_kill 1
+on_kill: if var:quest_kill == 10 then gold_add 500
+on_kill: if var:quest_kill == 10 then message Hoàn thành: +500 vàng
+on_menu: if var:quest_kill >= 10 then message Đã hoàn thành else message Tiến độ chưa đủ
+
+16. MẪU KỸ NĂNG DÙNG MP
+-----------------------
+# Skill gốc vẫn gây damage của chính Skill.
+# Script dưới đây trừ MP và bổ sung logic.
+on_start: set_max_mp 150
+on_start: set_mp 150
+on_attack: if mp >= 12 then mp_sub 12 else message Không đủ MP
+on_attack: if mp >= 12 and random <= 20 then damage 40
+on_mp_empty: message MP đã cạn
+
+17. GIỚI HẠN AN TOÀN
+--------------------
+- Tối đa 240 dòng lệnh cho một đoạn rules sau khi bỏ comment/dòng trống.
+- Rules tối đa 30.000 ký tự.
+- Class .gsc tối đa 12.000 ký tự.
+- Không hỗ trợ Java tùy ý, file hệ thống, shell, mạng hoặc vòng lặp vô hạn.
+- Không có ngoặc biểu thức if trong 0.6.
+- map/server/NPC/shop UI hoàn chỉnh là hệ engine tiếp theo; 0.6 tập trung runtime gameplay cốt lõi.
+
+18. GỢI Ý CÁCH VIẾT
+-------------------
+Thay vì viết một class quá lớn, chia ra:
+  PlayerStats.gsc       HP/MP/chỉ số
+  Combat.gsc            crit/hút máu/phòng thủ
+  Flying.gsc            bay/trọng lực
+  QuestMain.gsc         biến nhiệm vụ
+  InventoryRules.gsc    item logic
+  NpcShop.gsc           menu mua bán đơn giản
+
+AI trong xưởng đã được hướng dẫn dùng đúng cú pháp GSC 0.6; AI chỉ thêm code sau khi anh xem và bấm áp dụng.
