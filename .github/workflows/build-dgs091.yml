@@ -1,0 +1,10 @@
+name: Build DGS 0.9.1
+on:
+  push:
+    branches: [dragon-game-studio-0.9.1-build]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: echo build
