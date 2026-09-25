@@ -22,6 +22,7 @@ int activeSkillId=1;
 
  ArrayList<CharacterAction> characterActions=new ArrayList<>();
  int[] quickSkillIds=new int[9];
+ String[] quickActionKeys=new String[9];
  String basicAction="punch";
 
  ArrayList<GameModule> modules=new ArrayList<>();
@@ -30,6 +31,7 @@ int activeSkillId=1;
 resizeMap(width,height);
 skills.add(new Skill());
 quickSkillIds[0]=1;
+for(int i=0;i<quickActionKeys.length;i++)quickActionKeys[i]="skill"+(i+1);
 }
 
  Skill activeSkill(){
@@ -193,6 +195,10 @@ else{
 java.util.Arrays.fill(p.quickSkillIds,0);
 p.quickSkillIds[0]=p.activeSkillId;
 }
+JSONArray quickActions=j.optJSONArray("quickActionKeys");
+if(quickActions!=null){
+for(int i=0;i<p.quickActionKeys.length;i++)p.quickActionKeys[i]=i<quickActions.length()?quickActions.optString(i,"skill"+(i+1)):"skill"+(i+1);
+}
 
   JSONArray moduleData=j.optJSONArray("modules");
 if(moduleData!=null){
@@ -253,6 +259,9 @@ j.put("basicAction",basicAction);
 JSONArray quick=new JSONArray();
 for(int id:quickSkillIds)quick.put(id);
 j.put("quickSkillIds",quick);
+JSONArray quickActions=new JSONArray();
+for(String key:quickActionKeys)quickActions.put(key);
+j.put("quickActionKeys",quickActions);
 JSONArray files=new JSONArray();
 for(GameModule m:modules)files.put(m.json());
 j.put("modules",files);
@@ -298,6 +307,8 @@ if(!actionKeys.add(action.key))throw new IllegalArgumentException("Động tác 
 if(!basicAction.equals("punch")&&!basicAction.equals("kick")&&!basicAction.equals("slash"))throw new IllegalArgumentException("Động tác đánh thường phải là đấm, đá hoặc chém");
 if(quickSkillIds==null||quickSkillIds.length!=9)throw new IllegalArgumentException("Danh sách nút skill nhanh phải có 9 ô");
 for(int id:quickSkillIds)if(id!=0&&!ids.contains(id))throw new IllegalArgumentException("Nút skill nhanh đang gán skill không tồn tại: "+id);
+if(quickActionKeys==null||quickActionKeys.length!=9)throw new IllegalArgumentException("Danh sách animation nút skill phải có 9 ô");
+for(String key:quickActionKeys)if(!CharacterAction.allowedKey(key)||key.equals("stand")||key.equals("run")||key.equals("jump")||key.equals("fly"))throw new IllegalArgumentException("Animation nút skill không hợp lệ: "+key);
 
   if(modules.size()>40)throw new IllegalArgumentException("Tối đa 40 class game");
 Set<String> names=new HashSet<>();
