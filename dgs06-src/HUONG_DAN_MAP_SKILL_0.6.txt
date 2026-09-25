@@ -1,0 +1,42 @@
+DRAGON GAME STUDIO 0.6 — MAP + KHO TILE + THIẾT KẾ SKILL
+
+1. MAP VÀ KHO TILE
+- Mở tab “Map + kho tile”.
+- Bấm “Cắt tile vào kho” và chọn PNG.
+- Chọn vùng theo lưới 16×16 rồi bấm “Lưu vào kho + chọn”.
+- Tile được gom vào file riêng `tile-bank.png`.
+- Nửa trái màn hình là KHO TILE, nửa phải là CANVAS.
+- Chạm tile ở kho bên trái để chọn, sau đó kéo trên canvas bên phải để tô.
+- Có thể cắt nhiều ô cùng lúc và đặt nguyên khối lên map.
+- `tiles.png` cũ của bản 0.5 vẫn đọc được; 0.6 ưu tiên `tile-bank.png`.
+
+2. DANH SÁCH SKILL
+- Tab “Skill” chứa toàn bộ skill đã tạo.
+- Bấm “Sửa / gán eff” để chọn hiệu ứng từ danh sách hiệu ứng đã tạo.
+- Bấm “Test” để chạy skill đang chọn trong màn Chạy thử.
+
+3. THIẾT KẾ SKILL / EFFECT
+- Mở tab “Thiết kế skill”.
+- Bấm “Nhập ảnh để tạo hiệu ứng mới”.
+- Kéo trên ảnh để chọn vùng cần cắt.
+- “Cắt vùng”: giữ lại vùng chọn.
+- “Thu/phóng”: nhập kích thước PNG mới bằng pixel.
+- “Xoay 90°”, “Lật ngang”, “Lật dọc”: chỉnh hướng sprite.
+- Nhập Rộng frame, Cao frame và Số frame.
+- Bấm “Cắt frame + chạy thử” để xem animation.
+- Bấm “Lưu hiệu ứng”. Mỗi hiệu ứng có file riêng `effects/eff_ID.png`.
+
+4. FRAME KHÔNG CÒN 16×16
+Frame skill có thể dùng kích thước tùy ý: 24×32, 32×48, 64×64, 96×128, 128×64...
+Điều kiện là spritesheet phải chia đều theo Rộng frame × Cao frame đã khai báo.
+Ví dụ: ảnh 256×128, frame 64×64 => 4 cột × 2 hàng => tối đa 8 frame.
+
+5. GÁN SKILL VÀ EFFECT
+Trong tab “Thiết kế skill” có 2 danh sách:
+- Skill: danh sách các skill đã tạo.
+- Hiệu ứng: danh sách các effect đã tạo.
+Chọn cả hai rồi bấm “Gán skill ↔ hiệu ứng”.
+Có thể gán “Không hiệu ứng” để bỏ liên kết.
+
+6. XUẤT DỰ ÁN
+File `.dgproject` 0.6 chứa project.json, tile-bank.png, ảnh game, class GSC và toàn bộ thư mục effects/.
