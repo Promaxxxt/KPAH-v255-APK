@@ -5,7 +5,7 @@ on:
     branches:
       - dragon-game-studio-0.6-build
     paths:
-      - dgs06.patch
+      - 'dgs06-src/**'
       - dgs05-core.tar.gz.b64
       - dragon-debug.keystore.b64
       - .github/workflows/build-dgs05.yml
@@ -25,15 +25,13 @@ jobs:
           distribution: temurin
           java-version: '17'
 
-      - name: Restore 0.5 base and apply 0.6 patch
+      - name: Restore 0.5 base and overlay 0.6 source
         run: |
           set -euxo pipefail
           rm -rf dgs06
           mkdir -p dgs06
           base64 --decode dgs05-core.tar.gz.b64 | tar -xz -C dgs06
-          cd dgs06
-          patch -p1 < ../dgs06.patch
-          cd ..
+          cp -a dgs06-src/. dgs06/
           base64 --decode dragon-debug.keystore.b64 > dgs06/debug.keystore
           test -f dgs06/src/com/dragon9x/gamestudio/SkillEffect.java
           test -f dgs06/src/com/dragon9x/gamestudio/TilePaletteView.java
