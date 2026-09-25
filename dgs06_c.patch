@@ -1,0 +1,566 @@
+diff --git a/AndroidManifest.xml b/AndroidManifest.xml
+index 4bd8959..21f496d 100644
+--- a/AndroidManifest.xml
++++ b/AndroidManifest.xml
+@@ -1,4 +1,4 @@
+-<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.dragon9x.gamestudio" android:versionCode="5" android:versionName="0.5">
++<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.dragon9x.gamestudio" android:versionCode="6" android:versionName="0.6">
+     <uses-permission android:name="android.permission.INTERNET" />
+     <uses-sdk android:minSdkVersion="26" android:targetSdkVersion="34" />
+     <application android:label="Dragon Game Studio" android:theme="@android:style/Theme.Material.Light.NoActionBar" android:usesCleartextTraffic="false" android:allowBackup="false">
+diff --git a/BUILD_APK.sh b/BUILD_APK.sh
+index 1e842ab..7c53760 100755
+--- a/BUILD_APK.sh
++++ b/BUILD_APK.sh
+@@ -28,6 +28,6 @@ with zipfile.ZipFile(os.path.join(b,'resources.apk')) as inp,zipfile.ZipFile(os.
+  out.write(os.path.join(b,'classes.dex'),'classes.dex')
+ PY
+ "$tools_dir/zipalign" -f 4 "$build_dir/unsigned.apk" "$build_dir/aligned.apk"
+-"$tools_dir/apksigner" sign --ks "$project_dir/debug.keystore" --ks-key-alias dragon-debug --ks-pass pass:android --key-pass pass:android --out "$project_dir/DragonGameStudio-0.5-debug.apk" "$build_dir/aligned.apk"
+-"$tools_dir/apksigner" verify "$project_dir/DragonGameStudio-0.5-debug.apk"
+-echo "$project_dir/DragonGameStudio-0.5-debug.apk"
++"$tools_dir/apksigner" sign --ks "$project_dir/debug.keystore" --ks-key-alias dragon-debug --ks-pass pass:android --key-pass pass:android --out "$project_dir/DragonGameStudio-0.6-debug.apk" "$build_dir/aligned.apk"
++"$tools_dir/apksigner" verify "$project_dir/DragonGameStudio-0.6-debug.apk"
++echo "$project_dir/DragonGameStudio-0.6-debug.apk"
+diff --git a/HUONG_DAN_ENGINE_GSC_0.6.txt b/HUONG_DAN_ENGINE_GSC_0.6.txt
+new file mode 100644
+index 0000000..63d572e
+--- /dev/null
++++ b/HUONG_DAN_ENGINE_GSC_0.6.txt
+@@ -0,0 +1,366 @@
++DRAGON GAME STUDIO 0.6 — HƯỚNG DẪN ENGINE GSC
++================================================
++
++GSC là ngôn ngữ script an toàn của xưởng game. Mỗi lệnh nằm trên một dòng.
++Không phải Java. Script được kiểm tra trước khi lưu/chạy.
++
++1. CÚ PHÁP CƠ BẢN
++-----------------
++Dạng thường:
++  su_kien: lenh tham_so
++
++Ví dụ:
++  on_start: message Xin chào
++  on_kill: heal 20
++  on_menu: teleport 200 120
++
++Dòng chú thích bắt đầu bằng # hoặc //:
++  # Đây là chú thích
++
++2. IF / THEN / ELSE
++-------------------
++Dạng:
++  su_kien: if dieu_kien then lenh
++
++Có else:
++  su_kien: if dieu_kien then lenh else lenh
++
++Ví dụ:
++  on_hit: if hp <= 30 then heal 20
++  on_attack: if mp >= 10 then mp_sub 10 else message Không đủ MP
++  on_menu: if gold >= 100 then gold_sub 100 else message Thiếu vàng
++
++Toán tử so sánh:
++  ==   bằng
++  !=   khác
++  >    lớn hơn
++  >=   lớn hơn hoặc bằng
++  <    nhỏ hơn
++  <=   nhỏ hơn hoặc bằng
++
++Kết hợp nhiều điều kiện bằng and / or:
++  on_attack: if mp >= 10 and status:stun == 0 then mp_sub 10
++  on_hit: if hp_percent <= 25 or mp == 0 then message Nguy hiểm
++
++GSC 0.6 chưa dùng dấu ngoặc trong biểu thức. AND được nhóm trong từng vế OR.
++
++3. SỰ KIỆN
++-----------
++  on_start       Chạy khi bắt đầu Chạy thử.
++  on_attack      Sau khi nhân vật đánh trúng mục tiêu.
++  on_hit         Khi nhân vật bị quái đánh.
++  on_kill        Khi mục tiêu vừa bị hạ.
++  on_menu        Khi chọn/chạy hành động menu của class.
++  on_tick        Mỗi khoảng 1 giây trong Chạy thử.
++  on_move        Khi nhân vật đang di chuyển, giới hạn khoảng 4 lần/giây.
++  on_jump        Khi bắt đầu nhảy.
++  on_land        Khi rơi xuống đất sau nhảy/bay.
++  on_fly         Khi bắt đầu bay.
++  on_mp_empty    Khi MP vừa giảm về 0.
++  on_death       Khi HP vừa giảm về 0.
++
++4. BIẾN DÙNG TRONG IF
++---------------------
++  hp                 HP hiện tại
++  max_hp             HP tối đa hiện tại
++  hp_percent         % HP hiện tại, 0..100
++  mp                 MP hiện tại
++  max_mp             MP tối đa hiện tại
++  mp_percent         % MP hiện tại, 0..100
++  gold               vàng hiện tại
++  exp                EXP hiện tại
++  level              cấp hiện tại
++  x / y              tọa độ nhân vật
++  speed              tốc độ di chuyển
++  enemy_hp           HP mục tiêu hiện tại/gần nhất
++  enemy_count        số quái còn sống
++  enemy_alive        1 nếu còn quái, 0 nếu hết
++  flying             1 nếu đang bay, 0 nếu không
++  grounded           1 nếu đang đứng đất, 0 nếu đang trên không
++  last_crit          1 nếu đòn vừa rồi chí mạng
++  attack_bonus       sát thương cộng thêm
++  attack_multiplier  hệ số sát thương %, mặc định 100
++  defense            thủ phẳng
++  damage_reduction   giảm sát thương %, 0..100
++  random             số ngẫu nhiên 1..100 mỗi lần kiểm tra
++
++Biến tự tạo:
++  var:ten_bien
++Ví dụ:
++  on_start: set quest 0
++  on_kill: add quest 1
++  on_kill: if var:quest >= 10 then message Đã đủ 10 quái
++
++Kiểm tra vật phẩm:
++  item:id_vat_pham
++Ví dụ:
++  on_menu: if item:ve_dao >= 1 then item_remove ve_dao 1 else message Thiếu vé
++
++Kiểm tra trạng thái:
++  status:ten_trang_thai
++Ví dụ:
++  on_hit: if status:invincible == 0 then message Đã trúng đòn
++
++5. HIỂN THỊ
++-----------
++message NOI_DUNG
++  Hiện thông báo khoảng 3,2 giây.
++  Có biến thay thế: {hp} {max_hp} {mp} {max_mp} {gold} {exp} {level} {x} {y} {enemy_hp}
++
++Ví dụ:
++  on_tick: message HP {hp}/{max_hp} - MP {mp}/{max_mp}
++
++6. HP / MP
++----------
++heal N
++  Hồi N HP.
++
++heal_percent N
++  Hồi N% HP tối đa.
++
++damage N
++  Gây thêm N sát thương lên mục tiêu của sự kiện.
++
++damage_percent N
++  Trừ N% HP hiện tại của mục tiêu.
++
++enemy_heal N
++  Hồi HP cho mục tiêu.
++
++set_hp N
++  Đặt HP hiện tại.
++
++set_enemy_hp N
++  Đặt HP mục tiêu.
++
++set_max_hp N
++  Đổi HP tối đa trong lượt chạy thử.
++
++mp_add N
++  Hồi N MP.
++
++mp_add_percent N
++  Hồi N% MP tối đa.
++
++mp_sub N
++  Trừ N MP. Khi về 0 sẽ gọi on_mp_empty.
++
++set_mp N
++  Đặt MP hiện tại.
++
++set_max_mp N
++  Đổi MP tối đa.
++
++revive N
++  Nếu đã chết, hồi sinh với tối đa N HP.
++
++Ví dụ kỹ năng tốn MP:
++  on_attack: if mp >= 15 then mp_sub 15 else message Không đủ MP
++
++7. DI CHUYỂN / VẬT LÝ
++---------------------
++speed N
++  Đặt tốc độ px/giây.
++
++speed_add N
++  Cộng tốc độ.
++
++speed_sub N
++  Trừ tốc độ.
++
++teleport X Y
++  Dịch chuyển trong map hiện tại đến tọa độ X,Y.
++
++gravity N
++  Đặt gia tốc trọng lực, 0..5000. Mặc định lấy từ cấu hình dự án.
++
++jump N
++  Nhảy với lực N. Khoảng 300–600 dễ quan sát trong preview.
++
++fly on
++fly off
++fly toggle
++  Bật/tắt bay.
++
++fly_cost N
++  Đặt lượng MP tiêu hao mỗi giây khi bay.
++
++Ví dụ:
++  on_menu: jump 420
++  on_fly: message Bắt đầu bay
++  on_tick: if flying == 1 and mp <= 5 then fly off
++
++8. QUÁI
++-------
++spawn N
++  Sinh thêm N quái quanh vị trí quái mẫu. Một lệnh tối đa 20, preview tối đa 60 quái.
++
++Ví dụ:
++  on_kill: if enemy_count <= 2 then spawn 5
++
++9. VÀNG / EXP / LEVEL
++---------------------
++gold_add N
++  Cộng vàng.
++
++gold_sub N
++  Trừ vàng, không xuống dưới 0.
++
++exp_add N
++  Cộng EXP.
++
++level_set N
++  Đặt cấp.
++
++level_add N
++  Cộng/trừ cấp nhưng tối thiểu là 1.
++
++Ví dụ shop đơn giản:
++  on_menu: if gold >= 100 then gold_sub 100 else message Không đủ vàng
++
++10. BIẾN TÙY Ý
++---------------
++set TEN N
++  Gán biến.
++
++add TEN N
++  Cộng vào biến.
++
++sub TEN N
++  Trừ biến.
++
++random_set TEN MIN MAX
++  Gán số ngẫu nhiên MIN..MAX.
++
++Tên biến phải bắt đầu bằng chữ và chỉ gồm chữ, số, _.
++
++Ví dụ:
++  on_start: set combo 0
++  on_attack: add combo 1
++  on_hit: set combo 0
++  on_attack: if var:combo >= 5 then damage 50
++
++11. VẬT PHẨM / HÀNH TRANG SCRIPT
++--------------------------------
++item_add ID SO_LUONG
++  Thêm item script.
++
++item_remove ID SO_LUONG
++  Bớt item script, không âm.
++
++item_clear
++  Xóa toàn bộ item script của lượt chạy thử.
++
++Ví dụ:
++  on_kill: item_add da_quy 1
++  on_menu: if item:da_quy >= 5 then item_remove da_quy 5 else message Cần 5 đá quý
++
++Lưu ý: đây là hành trang logic của preview GSC; chưa phải UI túi đồ MMORPG hoàn chỉnh.
++
++12. TRẠNG THÁI / BUFF / DEBUFF
++------------------------------
++status_add TEN THOI_GIAN_MS
++  Thêm trạng thái trong số mili-giây đã cho.
++
++status_remove TEN
++  Xóa một trạng thái.
++
++status_clear
++  Xóa toàn bộ trạng thái.
++
++Tên trạng thái đặc biệt engine hiểu trực tiếp:
++  stun         không đi và không đánh được
++  root         không di chuyển được
++  silence      không đánh/kích hoạt skill được
++  invincible   không nhận đòn đánh thường từ quái
++
++Tên khác vẫn được lưu để dùng trong điều kiện status:TEN.
++
++Ví dụ:
++  on_hit: if random <= 20 then status_add stun 1500
++  on_tick: if status:stun == 1 then message Đang choáng
++
++13. CHIẾN ĐẤU NÂNG CAO
++----------------------
++attack_bonus N
++  Cộng N sát thương vào damage của skill đang dùng.
++
++attack_multiplier N
++  Nhân tổng sát thương theo %, mặc định 100.
++
++crit_chance N
++  Tỷ lệ chí mạng 0..100%.
++
++crit_damage N
++  Sát thương chí mạng theo %, mặc định 150.
++
++lifesteal N
++  Hút N% sát thương thực gây ra thành HP.
++
++defense N
++  Giảm phẳng sát thương quái gây lên người chơi.
++
++damage_reduction N
++  Giảm tiếp N% sát thương sau defense.
++
++Ví dụ build nhân vật:
++  on_start: attack_bonus 30
++  on_start: attack_multiplier 120
++  on_start: crit_chance 25
++  on_start: crit_damage 200
++  on_start: lifesteal 10
++  on_start: defense 3
++  on_start: damage_reduction 15
++  on_attack: if last_crit == 1 then message CHÍ MẠNG!
++
++14. MẪU CLASS GSC CÓ MENU
++-------------------------
++class KyNangBay
++menu Bật / tắt bay
++screen Kỹ năng bay
++text Bay tiêu hao MP mỗi giây. Hết MP sẽ tự hạ xuống.
++on_menu: fly toggle
++on_menu: message Trạng thái bay đã đổi
++on_mp_empty: fly off
++on_mp_empty: message Hết MP, tự hạ xuống
++
++15. MẪU HỆ THỐNG NHIỆM VỤ
++-------------------------
++class NhiemVuQuai
++menu Xem nhiệm vụ
++on_start: set quest_kill 0
++on_kill: add quest_kill 1
++on_kill: if var:quest_kill == 10 then gold_add 500
++on_kill: if var:quest_kill == 10 then message Hoàn thành: +500 vàng
++on_menu: if var:quest_kill >= 10 then message Đã hoàn thành else message Tiến độ chưa đủ
++
++16. MẪU KỸ NĂNG DÙNG MP
++-----------------------
++# Skill gốc vẫn gây damage của chính Skill.
++# Script dưới đây trừ MP và bổ sung logic.
++on_start: set_max_mp 150
++on_start: set_mp 150
++on_attack: if mp >= 12 then mp_sub 12 else message Không đủ MP
++on_attack: if mp >= 12 and random <= 20 then damage 40
++on_mp_empty: message MP đã cạn
++
++17. GIỚI HẠN AN TOÀN
++--------------------
++- Tối đa 240 dòng lệnh cho một đoạn rules sau khi bỏ comment/dòng trống.
++- Rules tối đa 30.000 ký tự.
++- Class .gsc tối đa 12.000 ký tự.
++- Không hỗ trợ Java tùy ý, file hệ thống, shell, mạng hoặc vòng lặp vô hạn.
++- Không có ngoặc biểu thức if trong 0.6.
++- map/server/NPC/shop UI hoàn chỉnh là hệ engine tiếp theo; 0.6 tập trung runtime gameplay cốt lõi.
++
++18. GỢI Ý CÁCH VIẾT
++-------------------
++Thay vì viết một class quá lớn, chia ra:
++  PlayerStats.gsc       HP/MP/chỉ số
++  Combat.gsc            crit/hút máu/phòng thủ
++  Flying.gsc            bay/trọng lực
++  QuestMain.gsc         biến nhiệm vụ
++  InventoryRules.gsc    item logic
++  NpcShop.gsc           menu mua bán đơn giản
++
++AI trong xưởng đã được hướng dẫn dùng đúng cú pháp GSC 0.6; AI chỉ thêm code sau khi anh xem và bấm áp dụng.
+diff --git a/HUONG_DAN_MAP_SKILL_0.6.txt b/HUONG_DAN_MAP_SKILL_0.6.txt
+new file mode 100644
+index 0000000..268d0c4
+--- /dev/null
++++ b/HUONG_DAN_MAP_SKILL_0.6.txt
+@@ -0,0 +1,42 @@
++DRAGON GAME STUDIO 0.6 — MAP + KHO TILE + THIẾT KẾ SKILL
++
++1. MAP VÀ KHO TILE
++- Mở tab “Map + kho tile”.
++- Bấm “Cắt tile vào kho” và chọn PNG.
++- Chọn vùng theo lưới 16×16 rồi bấm “Lưu vào kho + chọn”.
++- Tile được gom vào file riêng `tile-bank.png`.
++- Nửa trái màn hình là KHO TILE, nửa phải là CANVAS.
++- Chạm tile ở kho bên trái để chọn, sau đó kéo trên canvas bên phải để tô.
++- Có thể cắt nhiều ô cùng lúc và đặt nguyên khối lên map.
++- `tiles.png` cũ của bản 0.5 vẫn đọc được; 0.6 ưu tiên `tile-bank.png`.
++
++2. DANH SÁCH SKILL
++- Tab “Skill” chứa toàn bộ skill đã tạo.
++- Bấm “Sửa / gán eff” để chọn hiệu ứng từ danh sách hiệu ứng đã tạo.
++- Bấm “Test” để chạy skill đang chọn trong màn Chạy thử.
++
++3. THIẾT KẾ SKILL / EFFECT
++- Mở tab “Thiết kế skill”.
++- Bấm “Nhập ảnh để tạo hiệu ứng mới”.
++- Kéo trên ảnh để chọn vùng cần cắt.
++- “Cắt vùng”: giữ lại vùng chọn.
++- “Thu/phóng”: nhập kích thước PNG mới bằng pixel.
++- “Xoay 90°”, “Lật ngang”, “Lật dọc”: chỉnh hướng sprite.
++- Nhập Rộng frame, Cao frame và Số frame.
++- Bấm “Cắt frame + chạy thử” để xem animation.
++- Bấm “Lưu hiệu ứng”. Mỗi hiệu ứng có file riêng `effects/eff_ID.png`.
++
++4. FRAME KHÔNG CÒN 16×16
++Frame skill có thể dùng kích thước tùy ý: 24×32, 32×48, 64×64, 96×128, 128×64...
++Điều kiện là spritesheet phải chia đều theo Rộng frame × Cao frame đã khai báo.
++Ví dụ: ảnh 256×128, frame 64×64 => 4 cột × 2 hàng => tối đa 8 frame.
++
++5. GÁN SKILL VÀ EFFECT
++Trong tab “Thiết kế skill” có 2 danh sách:
++- Skill: danh sách các skill đã tạo.
++- Hiệu ứng: danh sách các effect đã tạo.
++Chọn cả hai rồi bấm “Gán skill ↔ hiệu ứng”.
++Có thể gán “Không hiệu ứng” để bỏ liên kết.
++
++6. XUẤT DỰ ÁN
++File `.dgproject` 0.6 chứa project.json, tile-bank.png, ảnh game, class GSC và toàn bộ thư mục effects/.
+diff --git a/README.md b/README.md
+index 7f614ef..9a16818 100644
+--- a/README.md
++++ b/README.md
+@@ -1,50 +1,30 @@
+-# Dragon Game Studio 0.5
++# Dragon Game Studio 0.6
+ 
+-Xưởng game độc lập cho Android. Có hai lựa chọn khi mở: map 2D tile 16×16 hoặc bố cục 2,5D cũ. Có thể cài đè 0.3 vì dùng cùng package và chữ ký thử. Từng dự án `.dgproject` là ZIP; có thể mở bằng trình giải nén trên PC.
++Bản 0.6 tập trung vào hai khu vực làm việc trực quan hơn: **Map + kho tile** và **Thiết kế skill/effect**.
+ 
+-## Code ở đâu và thư mục nào được tạo?
++## Map + kho tile
+ 
+-Tab **Mã nguồn** là nơi xem cây file trong dự án. Khi xuất dự án, ZIP chứa:
++- Tile map vẫn dùng ô logic 16×16 để tương thích engine 2D.
++- Tile cắt từ ảnh được lưu riêng trong `tile-bank.png` thay vì gắn trực tiếp vào canvas.
++- Màn tạo map chia hai phần: **kho tile bên trái** và **canvas bên phải**.
++- Chạm tile trong kho để chọn, sau đó kéo trên canvas để tô.
++- Có thể cắt một khối nhiều tile rồi đặt cả khối lên map.
++- Dự án 0.5 dùng `tiles.png` vẫn mở được; 0.6 ưu tiên `tile-bank.png`.
+ 
+-```text
+-project.json                    Cấu hình map, nhân vật, skill, luật và danh sách class
+-src/game/TenClass.gsc           Class script của game, có thể sửa và chạy thử
+-background.png                 Ảnh nền, nếu đã nhập
+-player.png                     Ảnh nhân vật, nếu đã nhập
+-enemy.png                      Ảnh quái, nếu đã nhập
+-tiles.png                      Atlas map, nếu đã nhập
+-effects.png                    Atlas hiệu ứng, nếu đã nhập
+-```
++## Skill + hiệu ứng
+ 
+-Trong ứng dụng, dự án được lưu ở vùng riêng của app (`game-project/`). `src/game/` là thư mục có thật trong vùng đó; file `.gsc` được đồng bộ từ `project.json`. Mục **engine/** trong tab Mã nguồn là Java của chính xưởng, đóng cùng APK và xem được ở chế độ chỉ đọc. Mã Java đầy đủ cùng kịch bản build nằm trong gói source.zip. Chưa có thư mục/server chạy MMORPG.
++Tab **Skill** quản lý danh sách skill và cho chọn hiệu ứng đã tạo. Tab **Thiết kế skill** quản lý kho effect riêng trong thư mục `effects/`.
+ 
+-## Tự tạo class, client và menu
++Quy trình: nhập PNG → kéo cắt vùng → thu/phóng → xoay 90° → lật ngang/dọc → nhập kích thước frame → nhập số frame → chạy thử animation → lưu hiệu ứng → chọn skill và gán effect.
+ 
+-Vào **Mã nguồn → + Thêm class luật / client / menu**. Chọn mẫu và sửa file. Ví dụ:
++Frame skill **không còn bắt buộc 16×16**. Có thể dùng 24×32, 48×64, 96×96, 128×64 hoặc kích thước khác miễn spritesheet chia đều theo kích thước frame đã khai báo.
+ 
+-```text
+-class NhaTro
+-menu Ghé nhà trọ
+-screen Nhà trọ
+-text Nghỉ chân và hồi 10 HP.
+-on_menu: heal 10
+-on_menu: message Đã nghỉ tại nhà trọ
+-```
++Mỗi hiệu ứng lưu thành file riêng như `effects/eff_1.png`, `effects/eff_2.png` và metadata nằm trong `project.json`. Khi xuất `.dgproject`, kho tile và toàn bộ effect cũng được đóng gói theo dự án.
+ 
+-`class NhaTro` phải trùng tên file `src/game/NhaTro.gsc`. Bấm **Kiểm tra + thêm vào game**. Sau đó mở **Chạy thử → Menu game → Ghé nhà trọ**. `screen` và `text` tạo một hộp thoại client đơn giản; hành động `on_menu` chạy khi chọn. GSC 0.5 hỗ trợ thêm `on_tick`, `on_move`, `on_jump`, `on_land`, `on_fly`, `on_mp_empty`, `on_death`; điều kiện `if ... then ... else ...` với `and/or`; HP/MP, trọng lực, nhảy/bay, biến, item, trạng thái, vàng/EXP/level và các chỉ số chiến đấu. Xem `HUONG_DAN_ENGINE_GSC_0.5.txt` hoặc nút **HƯỚNG DẪN ENGINE GSC** trong tab Mã nguồn. Có thể tạo tối đa 40 class script. Đây là ngôn ngữ script của xưởng; APK hiện **không biên dịch Java tùy ý** hoặc tạo màn hình Android phức tạp từ mã người dùng. Muốn sửa class Java của engine, tải source.zip, sửa trên PC rồi build lại APK xưởng.
++## GSC
+ 
+-## AI có thêm vào game hiện tại không?
++Runtime GSC vẫn hỗ trợ `if/then/else`, `and/or`, HP/MP, item, biến, trạng thái, trọng lực, nhảy/bay, chiến đấu và các sự kiện gameplay. Xem `HUONG_DAN_ENGINE_GSC_0.6.txt` hoặc nút hướng dẫn trong tab Mã nguồn.
+ 
+-Có, qua thao tác: **Code / AI → AI tạo class / menu vào dự án**, hoặc **Mã nguồn → AI viết class vào dự án**. Anh mô tả chức năng, AI trả JSON chứa đường dẫn `src/game/TenClass.gsc` và mã script; bản nháp hiện để anh đọc/sửa. Bấm **Áp dụng vào game** thì xưởng kiểm tra tên class và lệnh, lưu ngay vào dự án hiện tại rồi chạy thử. Nếu class đã có, xưởng hỏi trước khi ghi đè. Để thấy file bên ngoài app, xuất `.dgproject` rồi mở ZIP. AI được cấp danh sách cú pháp GSC 0.5 để sinh `if`, HP/MP, vật lý, item, trạng thái và chiến đấu đúng engine. Yêu cầu ngoài danh sách lệnh thật vẫn cần mở rộng Java engine và build lại. Không có việc AI âm thầm sửa APK.
++## Build APK
+ 
+-## Cấu hình nhiều API kiểu Recaf PC
+-
+-Trong **Code / AI → Cài đặt AI**, ngoài năm hồ sơ sẵn có (OpenAI Responses, Gemini, Claude, hai hồ sơ tương thích OpenAI) có thể tạo thêm tối đa 15 hồ sơ riêng, đặt tên như APInex/Groq/DeepSeek rồi nhập URL HTTPS, model ID và key của nguồn đó. Chat Completions tương thích chấp nhận URL đầy đủ, Base URL gốc hoặc đường dẫn kết thúc `/v1` và tự nối `/chat/completions`. Bấm **Kiểm tra API đang chọn** để gửi một yêu cầu thử ngắn; có thể phát sinh chi phí ở dịch vụ đang dùng. Mỗi key mã hóa riêng trong Android Keystore, không nằm trong file dự án. Việc đăng nhập ChatGPT bằng Codex CLI trên Recaf PC không có sẵn trong APK Android; muốn gọi OpenAI API cần API key có quyền truy cập riêng. Chưa kiểm tra mạng thật vì không có khóa của anh.
+-
+-## Map và skill
+-
+-**Map + cắt tile** dùng màn chọn vùng từ 1.17: bám lưới bật/tắt, kéo chọn theo khối bội số 16×16, thay ID tile hoặc thêm tile mới, rồi kéo đặt lên map. Hỗ trợ tô ô cản. Tab **Skill** tạo/sửa phái, sát thương, tầm đánh, hồi chiêu, dãy frame 16×16 và nút Test kết nối màn chạy thử. Bảng skill cũ từ JAR 1.17 chưa thể chuyển tự động sang class script game mới.
+-
+-## Build
+-
+-Chạy `./BUILD_APK.sh` bằng Android SDK, Python 3 và JDK có javac module. Keystore kèm theo chỉ dành cho bản thử; không dùng để phát hành. Bản chạy thử hiện một người trên máy; chưa có server đồng bộ nhiều người, tài khoản hoặc APK game xuất riêng. Bản 0.5 thêm runtime GSC mở rộng nhưng chưa biến script thành hệ MMORPG hoàn chỉnh.
++`BUILD_APK.sh` dùng Android SDK build-tools, platform android-34, JDK có `javac`, Python 3 và keystore `debug.keystore`. APK đầu ra là `DragonGameStudio-0.6-debug.apk`.
+diff --git a/src/com/dragon9x/gamestudio/AiClient.java b/src/com/dragon9x/gamestudio/AiClient.java
+index d82ceb5..fb14c79 100644
+--- a/src/com/dragon9x/gamestudio/AiClient.java
++++ b/src/com/dragon9x/gamestudio/AiClient.java
+@@ -24,7 +24,7 @@ final class AiClient {
+   if(model==null||!model.matches("[a-zA-Z0-9._/-]{1,80}"))throw new IOException("Tên model không hợp lệ");
+   URL url=new URL(endpoint.replace("{model}",model));if(!url.getProtocol().equals("https")||url.getUserInfo()!=null||url.getHost().isEmpty())throw new IOException("API URL phải dùng HTTPS");
+   if(provider.startsWith("compatible")){String path=url.getPath();if(path.isEmpty()||path.equals("/"))url=new URL(url.toString().replaceAll("/$","")+"/v1/chat/completions");else if(path.endsWith("/v1")||path.endsWith("/api/v1"))url=new URL(url.toString().replaceAll("/$","")+"/chat/completions");}
+-  String dsl="GSC 0.5. Mỗi dòng dạng su_kien: lenh. Sự kiện: on_start,on_attack,on_hit,on_kill,on_menu,on_tick,on_move,on_jump,on_land,on_fly,on_mp_empty,on_death. "
++  String dsl="GSC 0.6. Mỗi dòng dạng su_kien: lenh. Sự kiện: on_start,on_attack,on_hit,on_kill,on_menu,on_tick,on_move,on_jump,on_land,on_fly,on_mp_empty,on_death. "
+    +"Có điều kiện một dòng: if A OP B then LENH hoặc if A OP B and/or C OP D then LENH else LENH; OP là == != > >= < <=. "
+    +"Biến điều kiện: hp,max_hp,hp_percent,mp,max_mp,mp_percent,gold,exp,level,x,y,speed,enemy_hp,enemy_count,enemy_alive,flying,grounded,last_crit,attack_bonus,attack_multiplier,defense,damage_reduction,random,var:TEN,item:ID,status:TEN. "
+    +"Lệnh: message TEXT; heal N; heal_percent N; damage N; damage_percent N; enemy_heal N; set_hp N; set_enemy_hp N; mp_add N; mp_add_percent N; mp_sub N; set_mp N; set_max_hp N; set_max_mp N; speed N; speed_add N; speed_sub N; spawn N; teleport X Y; gravity N; jump N; fly on|off|toggle; fly_cost N; gold_add N; gold_sub N; exp_add N; level_set N; level_add N; set TEN N; add TEN N; sub TEN N; random_set TEN MIN MAX; item_add ID QTY; item_remove ID QTY; item_clear; status_add TEN MS; status_remove TEN; status_clear; attack_bonus N; attack_multiplier N; crit_chance N; crit_damage N; lifesteal N; defense N; damage_reduction N; revive N. "
+diff --git a/src/guide/GSC_ENGINE_GUIDE.txt b/src/guide/GSC_ENGINE_GUIDE.txt
+index 6701a7c..63d572e 100644
+--- a/src/guide/GSC_ENGINE_GUIDE.txt
++++ b/src/guide/GSC_ENGINE_GUIDE.txt
+@@ -1,4 +1,4 @@
+-DRAGON GAME STUDIO 0.5 — HƯỚNG DẪN ENGINE GSC
++DRAGON GAME STUDIO 0.6 — HƯỚNG DẪN ENGINE GSC
+ ================================================
+ 
+ GSC là ngôn ngữ script an toàn của xưởng game. Mỗi lệnh nằm trên một dòng.
+@@ -42,7 +42,7 @@ Kết hợp nhiều điều kiện bằng and / or:
+   on_attack: if mp >= 10 and status:stun == 0 then mp_sub 10
+   on_hit: if hp_percent <= 25 or mp == 0 then message Nguy hiểm
+ 
+-GSC 0.5 chưa dùng dấu ngoặc trong biểu thức. AND được nhóm trong từng vế OR.
++GSC 0.6 chưa dùng dấu ngoặc trong biểu thức. AND được nhóm trong từng vế OR.
+ 
+ 3. SỰ KIỆN
+ -----------
+@@ -350,8 +350,8 @@ on_mp_empty: message MP đã cạn
+ - Rules tối đa 30.000 ký tự.
+ - Class .gsc tối đa 12.000 ký tự.
+ - Không hỗ trợ Java tùy ý, file hệ thống, shell, mạng hoặc vòng lặp vô hạn.
+-- Không có ngoặc biểu thức if trong 0.5.
+-- map/server/NPC/shop UI hoàn chỉnh là hệ engine tiếp theo; 0.5 tập trung runtime gameplay cốt lõi.
++- Không có ngoặc biểu thức if trong 0.6.
++- map/server/NPC/shop UI hoàn chỉnh là hệ engine tiếp theo; 0.6 tập trung runtime gameplay cốt lõi.
+ 
+ 18. GỢI Ý CÁCH VIẾT
+ -------------------
+@@ -363,4 +363,4 @@ Thay vì viết một class quá lớn, chia ra:
+   InventoryRules.gsc    item logic
+   NpcShop.gsc           menu mua bán đơn giản
+ 
+-AI trong xưởng đã được hướng dẫn dùng đúng cú pháp GSC 0.5; AI chỉ thêm code sau khi anh xem và bấm áp dụng.
++AI trong xưởng đã được hướng dẫn dùng đúng cú pháp GSC 0.6; AI chỉ thêm code sau khi anh xem và bấm áp dụng.
