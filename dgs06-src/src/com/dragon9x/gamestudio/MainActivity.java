@@ -998,3 +998,645 @@ e.id=positive(effectId,"ID");
 e.name=effectName.getText().toString().trim();
 e.fileName="effects/eff_"+e.id+".png";
 e.frameWidth=positive(frameW,"Rộng frame");
+e.frameHeight=positive(frameH,"Cao frame");
+e.frameCount=positive(frameCount,"Số frame");
+e.frameMs=positive(frameMs,"Frame ms");
+e.validate();
+if(working[0].getWidth()%e.frameWidth!=0||working[0].getHeight()%e.frameHeight!=0)throw new IllegalArgumentException("Ảnh phải chia đều thành lưới frame "+e.frameWidth+"×"+e.frameHeight);
+int cap=(working[0].getWidth()/e.frameWidth)*(working[0].getHeight()/e.frameHeight);
+if(e.frameCount>cap)throw new IllegalArgumentException("Số frame tối đa là "+cap);
+GameProject next=GameProject.fromJson(project.json().toString());
+for(SkillEffect other:next.effects)if((original==null||other.id!=original.id)&&other.id==e.id)throw new IllegalArgumentException("ID hiệu ứng đã tồn tại");
+if(original!=null){
+next.effects.removeIf(x->x.id==original.id);
+if(original.id!=e.id)for(Skill sk:next.skills)if(sk.effectId==original.id)sk.effectId=e.id;
+}
+next.effects.add(e);
+next.validate();
+store.saveEffect(e,TileLibrary.png(working[0]));
+if(original!=null&&!original.fileName.equals(e.fileName))store.deleteEffect(original);
+project=next;
+store.save(project);
+reloadImages();
+refreshEffects();
+refreshSkills();
+status.setText("Đã lưu "+e.name+" • "+e.frameWidth+"×"+e.frameHeight+" • "+e.frameCount+" frame");
+dialog.dismiss();
+}
+catch(Exception ex){
+error(ex);
+}
+}
+);
+
+ }
+
+ void buildCode(){
+codePage.addView(text("GSC 0.6: sự kiện + hành động, có if/then/else, and/or, biến, HP/MP, vật phẩm và vật lý. AI tạo bản nháp để anh xem trước.",12,Color.DKGRAY));
+
+  code=new EditText(this);
+code.setGravity(Gravity.TOP);
+code.setTextSize(12);
+code.setTypeface(android.graphics.Typeface.MONOSPACE);
+code.setBackgroundColor(Color.WHITE);
+code.setPadding(dp(10),dp(10),dp(10),dp(10));
+code.setInputType(InputType.TYPE_CLASS_TEXT|InputType.TYPE_TEXT_FLAG_MULTI_LINE);
+codePage.addView(code,new LinearLayout.LayoutParams(-1,0,1));
+
+  codePage.addView(text("Ví dụ: on_hit: if hp <= 30 then heal 20 else message HP {hp} • on_menu: jump 420 • on_tick: if flying == 1 and mp <= 5 then fly off",11,Color.DKGRAY));
+
+  LinearLayout buttons=new LinearLayout(this);
+buttons.addView(button("Kiểm tra + lưu",v->saveCode()));
+buttons.addView(button("Chạy thử",v->{
+if(saveCode())show(3);
+}
+));
+buttons.addView(button("Cài đặt AI",v->aiSettings()));
+codePage.addView(buttons);
+
+  prompt=new EditText(this);
+prompt.setSingleLine(false);
+prompt.setMaxLines(3);
+prompt.setHint("Nói AI muốn tạo tính năng gì trong game…");
+codePage.addView(prompt);
+
+  codePage.addView(button("AI viết luật vào tab hiện tại",v->generate()));
+codePage.addView(button("AI tạo class / menu vào dự án",v->generateModule()));
+
+ }
+
+ void buildPlay(){
+HorizontalScrollView bar=new HorizontalScrollView(this);
+LinearLayout row=new LinearLayout(this);
+row.addView(button("Chạy lại",v->{
+try{
+playStage.start();
+}
+catch(Exception e){
+error(e);
+}
+}
+));
+row.addView(button("Menu game",v->showMenus()));
+row.addView(button("Nhảy",v->playStage.manualJump()));
+row.addView(button("Bay ON/OFF",v->playStage.toggleFly()));
+row.addView(button("Về bố cục",v->show(1)));
+bar.addView(row);
+playPage.addView(bar);
+playStage=new StageView(this);
+playPage.addView(playStage,new LinearLayout.LayoutParams(-1,0,1));
+playPage.addView(text("Kéo vùng trái để đi; vùng phải để đánh. Nút Nhảy/Bay giúp thử engine vật lý. HUD hiển thị cả HP và MP.",11,Color.DKGRAY));
+}
+
+ void refreshProject(){
+name.setText(project.name);
+width.setText(""+project.width);
+height.setText(""+project.height);
+maxHp.setText(""+project.maxHp);
+maxMp.setText(""+project.maxMp);
+speed.setText(""+project.speed);
+gravity.setText(""+project.gravity);
+flyCost.setText(""+project.flyCost);
+damage.setText(""+project.attackDamage);
+range.setText(""+project.attackRange);
+cooldown.setText(""+project.attackCooldown);
+enemyHp.setText(""+project.enemyHp);
+enemyDamage.setText(""+project.enemyDamage);
+movement.setSelection(project.movement.equals("4 hướng")?1:0);
+attackMode.setSelection(project.attackMode.equals("Giữ")?1:0);
+gameMode.setSelection(project.mode.equals("2D")?0:1);
+code.setText(project.rules);
+reloadImages();
+}
+
+ Bitmap activeEffectBitmap(){
+SkillEffect e=project.activeEffect();
+return e==null?store.bitmap("effects.png"):store.effectBitmap(e.fileName);
+}
+
+ void reloadImages(){
+background=store.bitmap("background.png");
+playerImage=store.bitmap("player.png");
+enemyImage=store.bitmap("enemy.png");
+tileImage=store.bitmap("tile-bank.png");
+if(tileImage==null)tileImage=store.bitmap("tiles.png");
+effectImage=activeEffectBitmap();
+if(tilePalette!=null)tilePalette.setAtlas(tileImage);
+editorStage.bind(project,background,playerImage,enemyImage,tileImage,effectImage,()->{
+try{
+store.save(project);
+status.setText("Đã lưu map "+project.mode+" • nhân vật "+project.playerX+","+project.playerY);
+}
+catch(Exception e){
+error(e);
+}
+}
+);
+playStage.bind(project,background,playerImage,enemyImage,tileImage,effectImage,null);
+}
+
+ boolean saveForm(){
+try{
+GameProject next=GameProject.fromJson(project.json().toString());
+next.name=name.getText().toString().trim();
+int newWidth=Integer.parseInt(width.getText().toString()),newHeight=Integer.parseInt(height.getText().toString());
+next.resizeMap(newWidth,newHeight);
+String newMode=gameMode.getSelectedItemPosition()==0?"2D":"2.5D";
+if(!next.mode.equals(newMode)){
+next.mode=newMode;
+if(newMode.equals("2D")){
+next.joystickX=50;
+next.joystickY=190;
+next.attackX=350;
+next.attackY=190;
+}
+else{
+next.joystickX=85;
+next.joystickY=newHeight-85;
+next.attackX=newWidth-90;
+next.attackY=newHeight-85;
+}
+}
+next.maxHp=Integer.parseInt(maxHp.getText().toString());
+next.maxMp=Integer.parseInt(maxMp.getText().toString());
+next.speed=Integer.parseInt(speed.getText().toString());
+next.gravity=Integer.parseInt(gravity.getText().toString());
+next.flyCost=Integer.parseInt(flyCost.getText().toString());
+next.attackDamage=Integer.parseInt(damage.getText().toString());
+next.attackRange=Integer.parseInt(range.getText().toString());
+next.attackCooldown=Integer.parseInt(cooldown.getText().toString());
+next.enemyHp=Integer.parseInt(enemyHp.getText().toString());
+next.enemyDamage=Integer.parseInt(enemyDamage.getText().toString());
+next.movement=movement.getSelectedItem().toString();
+next.attackMode=attackMode.getSelectedItem().toString();
+next.rules=code.getText().toString();
+next.joystickX=Math.min(next.width,next.joystickX);
+next.joystickY=Math.min(next.height,next.joystickY);
+next.attackX=Math.min(next.width,next.attackX);
+next.attackY=Math.min(next.height,next.attackY);
+next.playerX=Math.min(next.width-1,next.playerX);
+next.playerY=Math.min(next.height-1,next.playerY);
+next.enemyX=Math.min(next.width-1,next.enemyX);
+next.enemyY=Math.min(next.height-1,next.enemyY);
+next.validate();
+project=next;
+store.save(project);
+reloadImages();
+status.setText("Đã lưu "+project.name+" • "+project.mode);
+return true;
+}
+catch(Exception e){
+error(e);
+return false;
+}
+}
+
+ boolean saveCode(){
+try{
+String draft=code.getText().toString();
+GameRules.parse(draft);
+project.rules=draft;
+store.save(project);
+status.setText("Code hợp lệ • "+GameRules.parse(draft).size()+" lệnh");
+return true;
+}
+catch(Exception e){
+error(e);
+return false;
+}
+}
+
+ void show(int page){
+if(pages==null)return;
+if(activePage==0&&page!=0&&name!=null&&!saveForm())return;
+if(activePage==2&&page!=2&&code!=null&&!saveCode())return;
+if(playStage!=null&&page!=3)playStage.stop();
+activePage=page;
+
+  ((View)projectPage.getParent()).setVisibility(page==0?View.VISIBLE:View.GONE);
+layoutPage.setVisibility(page==1?View.VISIBLE:View.GONE);
+codePage.setVisibility(page==2?View.VISIBLE:View.GONE);
+playPage.setVisibility(page==3?View.VISIBLE:View.GONE);
+((View)skillsPage.getParent()).setVisibility(page==4?View.VISIBLE:View.GONE);
+((View)effectsPage.getParent()).setVisibility(page==5?View.VISIBLE:View.GONE);
+((View)filesPage.getParent()).setVisibility(page==6?View.VISIBLE:View.GONE);
+
+  if(page==4)refreshSkills();
+if(page==5)refreshEffects();
+if(page==6)refreshFiles();
+if(page==3){
+try{
+effectImage=activeEffectBitmap();
+playStage.bind(project,background,playerImage,enemyImage,tileImage,effectImage,null);
+playStage.start();
+SkillEffect eff=project.activeEffect();
+status.setText("Đang test skill "+project.activeSkill().name+(eff==null?"":" • eff "+eff.name)+" • "+project.name);
+}
+catch(Exception e){
+error(e);
+}
+}
+
+ }
+
+ void pick(int request,String mime){
+Intent i=new Intent(Intent.ACTION_OPEN_DOCUMENT);
+i.setType(mime);
+i.addCategory(Intent.CATEGORY_OPENABLE);
+startActivityForResult(i,request);
+}
+
+ void exportProject(){
+if(!saveForm())return;
+Intent i=new Intent(Intent.ACTION_CREATE_DOCUMENT);
+i.setType("application/zip");
+i.putExtra(Intent.EXTRA_TITLE,project.name.replaceAll("[^a-zA-Z0-9_-]","_")+".dgproject");
+startActivityForResult(i,EXPORT);
+}
+
+ @Override protected void onActivityResult(int req,int result,Intent data){
+super.onActivityResult(req,result,data);
+if(result!=RESULT_OK||data==null||data.getData()==null)return;
+Uri uri=data.getData();
+try{
+
+   if(req==CROP_SOURCE){
+byte[] raw;
+try(InputStream in=getContentResolver().openInputStream(uri)){
+raw=ProjectStore.readStream(in,8*1024*1024);
+}
+BitmapFactory.Options bounds=new BitmapFactory.Options();
+bounds.inJustDecodeBounds=true;
+BitmapFactory.decodeByteArray(raw,0,raw.length,bounds);
+if(bounds.outWidth<16||bounds.outHeight<16||(long)bounds.outWidth*bounds.outHeight>8000000)throw new IOException("Ảnh cắt cần tối thiểu 16×16, tối đa 8 triệu pixel");
+Bitmap source=BitmapFactory.decodeByteArray(raw,0,raw.length);
+if(source==null)throw new IOException("Không đọc được ảnh");
+cropDialog(source);
+}
+
+   else if(req==EFFECT_DESIGN_SOURCE){
+byte[] raw;
+try(InputStream in=getContentResolver().openInputStream(uri)){
+raw=ProjectStore.readStream(in,8*1024*1024);
+}
+Bitmap source=BitmapFactory.decodeByteArray(raw,0,raw.length);
+if(source==null||(long)source.getWidth()*source.getHeight()>8000000)throw new IOException("Không đọc được ảnh skill hoặc ảnh quá lớn");
+effectDesignDialog(source,null);
+}
+
+   else if(req==BACKGROUND||req==PLAYER||req==ENEMY||req==TILES||req==EFFECTS){
+String asset=req==BACKGROUND?"background.png":req==PLAYER?"player.png":req==ENEMY?"enemy.png":req==TILES?"tile-bank.png":"effects.png";
+try(InputStream in=getContentResolver().openInputStream(uri)){
+store.image(asset,ProjectStore.readStream(in,8*1024*1024));
+}
+reloadImages();
+status.setText("Đã nhập "+asset);
+}
+
+   else if(req==IMPORT){
+try(InputStream in=getContentResolver().openInputStream(uri)){
+project=store.importFrom(in);
+}
+refreshProject();
+show(0);
+status.setText("Đã mở dự án "+project.name);
+}
+
+   else if(req==EXPORT){
+try(OutputStream out=getContentResolver().openOutputStream(uri)){
+store.exportTo(out,project);
+}
+status.setText("Đã xuất dự án "+project.name);
+}
+
+  }
+catch(Exception e){
+error(e);
+}
+}
+
+ void aiSettings(){
+android.content.SharedPreferences pref=getSharedPreferences("ai_settings",0);
+LinearLayout panel=new LinearLayout(this);
+panel.setOrientation(LinearLayout.VERTICAL);
+panel.setPadding(dp(14),dp(8),dp(14),dp(6));
+
+  Spinner provider=new Spinner(this);
+ArrayList<String> ids=AiProfiles.ids(pref);
+ArrayAdapter<String> adapter=new ArrayAdapter<>(this,android.R.layout.simple_spinner_item);
+adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+for(String id:ids)adapter.add(AiProfiles.label(pref,id));
+provider.setAdapter(adapter);
+panel.addView(text("Nguồn AI riêng • thêm tối đa 20 hồ sơ",12,Color.DKGRAY));
+panel.addView(provider);
+
+  EditText endpoint=new EditText(this);
+endpoint.setSingleLine(true);
+panel.addView(text("API URL HTTPS (có thể nhập Base URL)",12,Color.DKGRAY));
+panel.addView(endpoint);
+
+  EditText model=new EditText(this);
+model.setSingleLine(true);
+panel.addView(text("Model ID • nhập chính xác tên của nguồn",12,Color.DKGRAY));
+panel.addView(model);
+
+  EditText key=new EditText(this);
+key.setSingleLine(true);
+key.setInputType(InputType.TYPE_CLASS_TEXT|InputType.TYPE_TEXT_VARIATION_PASSWORD);
+key.setHint("API key mới • để trống giữ khóa cũ");
+panel.addView(text("Khóa mã hóa riêng cho mỗi hồ sơ",12,Color.DKGRAY));
+panel.addView(key);
+
+  provider.setOnItemSelectedListener(new android.widget.AdapterView.OnItemSelectedListener(){
+public void onNothingSelected(android.widget.AdapterView<?> p){
+}
+public void onItemSelected(android.widget.AdapterView<?> p,View v,int pos,long id){
+String source=ids.get(pos);
+endpoint.setText(AiProfiles.endpoint(pref,source));
+model.setText(AiProfiles.model(pref,source));
+key.setText("");
+}
+}
+);
+
+  provider.setSelection(Math.max(0,ids.indexOf(AiProfiles.selected(pref))));
+LinearLayout actions=new LinearLayout(this);
+actions.addView(button("+ Nguồn mới",v->{
+new AlertDialog.Builder(this).setTitle("Chọn giao thức").setItems(AiProfiles.TYPE_LABELS,(d,selected)->{
+EditText label=new EditText(this);
+label.setSingleLine(true);
+label.setHint("Ví dụ: APInex, Groq, DeepSeek");
+new AlertDialog.Builder(this).setTitle("Đặt tên hồ sơ").setView(label).setNegativeButton("Hủy",null).setPositiveButton("Tạo",(dd,ww)->{
+try{
+String created=AiProfiles.add(pref,label.getText().toString(),AiProfiles.TYPES[selected]);
+dialogDismissAndReopenAi(provider,pref);
+status.setText("Đã thêm "+AiProfiles.label(pref,created));
+}
+catch(Exception e){
+error(e);
+}
+}
+).show();
+}
+).show();
+}
+));
+
+  actions.addView(button("Xóa hồ sơ",v->{
+String source=ids.get(provider.getSelectedItemPosition());
+if(AiProfiles.number(source)<1){
+toast("Nguồn mặc định: chỉ xóa được key");
+return;
+}
+new AlertDialog.Builder(this).setTitle("Xóa hồ sơ "+AiProfiles.label(pref,source)+"?").setNegativeButton("Hủy",null).setPositiveButton("Xóa",(d,w)->{
+ApiKeyStore.clear(this,source);
+AiProfiles.delete(pref,source);
+dialogDismissAndReopenAi(provider,pref);
+}
+).show();
+}
+));
+panel.addView(actions);
+
+  panel.addView(button("Kiểm tra API đang chọn",v->{
+try{
+String source=ids.get(provider.getSelectedItemPosition());
+String secret=key.length()>0?key.getText().toString().trim():ApiKeyStore.load(this,source);
+String api=endpoint.getText().toString().trim(),modelName=model.getText().toString().trim();
+status.setText("Đang gửi một yêu cầu kiểm tra đến "+AiProfiles.label(pref,source));
+new Thread(()->{
+try{
+String answer=AiClient.generate(source,api,modelName,secret,"Viết đúng 1 dòng on_start: message OK",project);
+runOnUiThread(()->new AlertDialog.Builder(this).setTitle("API phản hồi").setMessage(answer.substring(0,Math.min(answer.length(),500))).setPositiveButton("Đóng",null).show());
+}
+catch(Exception e){
+runOnUiThread(()->error(e));
+}
+}
+).start();
+}
+catch(Exception e){
+error(e);
+}
+}
+));
+
+  ScrollView scroll=new ScrollView(this);
+scroll.addView(panel);
+AlertDialog dialog=new AlertDialog.Builder(this).setTitle("Nguồn AI • như cấu hình Recaf PC").setView(scroll).setNeutralButton("Xóa key",null).setNegativeButton("Đóng",null).setPositiveButton("Lưu nguồn này",null).create();
+activeAiDialog=dialog;
+dialog.show();
+dialog.getButton(AlertDialog.BUTTON_NEUTRAL).setOnClickListener(v->{
+String source=ids.get(provider.getSelectedItemPosition());
+ApiKeyStore.clear(this,source);
+status.setText("Đã xóa khóa "+source);
+key.setText("");
+}
+);
+dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v->{
+try{
+String source=ids.get(provider.getSelectedItemPosition()),api=endpoint.getText().toString().trim(),modelName=model.getText().toString().trim();
+if(!modelName.matches("[a-zA-Z0-9._/-]{1,80}"))throw new IOException("Model không hợp lệ");
+URL url=new URL(api.replace("{model}",modelName));
+if(!url.getProtocol().equals("https")||url.getHost().isEmpty()||url.getUserInfo()!=null)throw new IOException("API URL phải là HTTPS");
+if(key.length()>0)ApiKeyStore.save(this,source,key.getText().toString().trim());
+pref.edit().putString(source+"_endpoint",api).putString(source+"_model",modelName).putString("selected_profile",source).apply();
+dialog.dismiss();
+status.setText("Đã chọn "+AiProfiles.label(pref,source));
+}
+catch(Exception e){
+error(e);
+}
+}
+);
+
+ }
+
+ void dialogDismissAndReopenAi(Spinner spinner,android.content.SharedPreferences pref){
+if(activeAiDialog!=null)activeAiDialog.dismiss();
+aiSettings();
+}
+
+ void generate(){
+String request=prompt.getText().toString().trim();
+if(request.isEmpty()){
+toast("Viết yêu cầu cho AI trước");
+return;
+}
+final GameProject snapshot;
+try{
+snapshot=GameProject.fromJson(project.json().toString());
+snapshot.rules=code.getText().toString();
+snapshot.validate();
+}
+catch(Exception e){
+error(e);
+return;
+}
+
+  android.content.SharedPreferences pref=getSharedPreferences("ai_settings",0);
+String source=AiProfiles.selected(pref),endpoint=AiProfiles.endpoint(pref,source),model=AiProfiles.model(pref,source);
+status.setText("AI "+AiProfiles.label(pref,source)+" đang soạn code…");
+
+  new Thread(()->{
+try{
+String draft=AiClient.generate(source,endpoint,model,ApiKeyStore.load(this,source),request,snapshot);
+runOnUiThread(()->draftDialog(draft));
+}
+catch(Exception e){
+runOnUiThread(()->{
+status.setText("AI chưa tạo được code");
+error(e);
+}
+);
+}
+}
+).start();
+
+ }
+
+ void generateModule(){
+EditText request=new EditText(this);
+request.setMinLines(3);
+request.setHint("Ví dụ: tạo menu nhà trọ, hồi 10 HP khi chọn");
+request.setText(prompt.getText());
+new AlertDialog.Builder(this).setTitle("Yêu cầu AI viết class game").setView(request).setNegativeButton("Hủy",null).setPositiveButton("Tạo bản nháp",(d,w)->{
+String task=request.getText().toString().trim();
+if(task.isEmpty()){
+toast("Cần mô tả class hoặc menu");
+return;
+}
+try{
+GameProject snapshot=GameProject.fromJson(project.json().toString());
+android.content.SharedPreferences pref=getSharedPreferences("ai_settings",0);
+String id=AiProfiles.selected(pref),endpoint=AiProfiles.endpoint(pref,id),model=AiProfiles.model(pref,id);
+status.setText("AI đang soạn class cho dự án…");
+new Thread(()->{
+try{
+String raw=AiClient.generateModule(id,endpoint,model,ApiKeyStore.load(this,id),task,snapshot);
+runOnUiThread(()->moduleDraftDialog(raw));
+}
+catch(Exception e){
+runOnUiThread(()->error(e));
+}
+}
+).start();
+}
+catch(Exception e){
+error(e);
+}
+}
+).show();
+}
+
+ void moduleDraftDialog(String draft){
+EditText preview=new EditText(this);
+preview.setTypeface(android.graphics.Typeface.MONOSPACE);
+preview.setTextSize(12);
+preview.setText(draft);
+preview.setMinLines(10);
+ScrollView scroll=new ScrollView(this);
+scroll.addView(preview);
+AlertDialog dialog=new AlertDialog.Builder(this).setTitle("AI đề xuất class • xem trước khi thêm").setMessage("AI sẽ chỉ thêm vào game sau khi anh bấm Áp dụng. Có thể sửa JSON bản nháp ở đây.").setView(scroll).setNegativeButton("Bỏ",null).setPositiveButton("Áp dụng vào game",null).create();
+dialog.show();
+dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v->{
+try{
+String raw=preview.getText().toString().trim();
+if(raw.startsWith("```")){
+raw=raw.replaceFirst("^```(?:json)?\\s*","").replaceFirst("\\s*```$","");
+}
+org.json.JSONObject j=new org.json.JSONObject(raw);
+String path=j.getString("path");
+if(!path.matches("src/game/[A-Za-z][A-Za-z0-9_]{0,39}\\.gsc"))throw new IOException("AI phải tạo path src/game/TenClass.gsc");
+String moduleName=path.substring("src/game/".length(),path.length()-4);
+GameModule candidate=new GameModule(moduleName,j.getString("source"));
+boolean exists=false;
+for(GameModule m:project.modules)if(m.name.equals(moduleName))exists=true;
+final boolean overwrite=exists;
+if(overwrite)new AlertDialog.Builder(this).setTitle("Ghi đè " +path+"?").setMessage("Class này đã có trong game. Bản AI sẽ thay mã cũ sau khi anh xác nhận.").setNegativeButton("Hủy",null).setPositiveButton("Ghi đè",(dd,ww)->{
+try{
+applyModule(candidate,moduleName);
+dialog.dismiss();
+show(3);
+}
+catch(Exception e){
+error(e);
+}
+}
+).show();
+else{
+applyModule(candidate,moduleName);
+dialog.dismiss();
+show(3);
+}
+}
+catch(Exception e){
+error(e);
+}
+}
+);
+}
+
+ void draftDialog(String draft){
+String warning="";
+try{
+GameRules.parse(draft);
+}
+catch(Exception e){
+warning="AI viết mã chưa chạy được: "+e.getMessage()+". Anh có thể sửa bản nháp bên dưới.";
+}
+LinearLayout body=new LinearLayout(this);
+body.setOrientation(LinearLayout.VERTICAL);
+if(!warning.isEmpty())body.addView(text(warning,11,0xffa33224));
+EditText preview=new EditText(this);
+preview.setTypeface(android.graphics.Typeface.MONOSPACE);
+preview.setText(draft);
+preview.setMinLines(6);
+preview.setMaxLines(18);
+body.addView(preview);
+ScrollView scroll=new ScrollView(this);
+scroll.addView(body);
+AlertDialog dialog=new AlertDialog.Builder(this).setTitle("Code AI đề xuất • kiểm tra trước khi áp dụng").setView(scroll).setNegativeButton("Bỏ",null).setPositiveButton("Áp dụng + chạy thử",null).create();
+dialog.show();
+dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v->{
+try{
+String result=preview.getText().toString();
+GameRules.parse(result);
+GameProject next=GameProject.fromJson(project.json().toString());
+next.rules=result;
+store.save(next);
+project=next;
+code.setText(result);
+dialog.dismiss();
+status.setText("Đã áp dụng code AI có kiểm tra");
+show(3);
+}
+catch(Exception e){
+error(e);
+}
+}
+);
+}
+
+ void toast(String s){
+Toast.makeText(this,s,Toast.LENGTH_LONG).show();
+}
+
+ void error(Exception e){
+new AlertDialog.Builder(this).setTitle("Không thực hiện được").setMessage(e.getMessage()==null?e.toString():e.getMessage()).setPositiveButton("Đóng",null).show();
+}
+
+ @Override protected void onPause(){
+if(playStage!=null)playStage.stop();
+super.onPause();
+}
+
+ @Override public void onBackPressed(){
+if(activePage!=0){
+show(0);
+return;
+}
+super.onBackPressed();
+}
+
+}
