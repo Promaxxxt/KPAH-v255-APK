@@ -1,0 +1,238 @@
+diff --git a/src/com/dragon9x/gamestudio/EffectPreviewView.java b/src/com/dragon9x/gamestudio/EffectPreviewView.java
+new file mode 100644
+index 0000000..5f1901c
+--- /dev/null
++++ b/src/com/dragon9x/gamestudio/EffectPreviewView.java
+@@ -0,0 +1,17 @@
++package com.dragon9x.gamestudio;
++
++import android.content.Context;
++import android.graphics.*;
++import android.view.View;
++
++/** Small animation player for arbitrary-size skill effect frames. */
++final class EffectPreviewView extends View {
++ final Paint paint=new Paint(Paint.ANTI_ALIAS_FLAG);Bitmap bitmap;int frameWidth=1,frameHeight=1,frameCount=1,frameMs=80,frame;boolean running;
++ EffectPreviewView(Context c){super(c);paint.setFilterBitmap(false);setBackgroundColor(0xff17212b);}
++ void setEffect(Bitmap b,int fw,int fh,int count,int ms){bitmap=b;frameWidth=Math.max(1,fw);frameHeight=Math.max(1,fh);frameCount=Math.max(1,count);frameMs=Math.max(20,ms);frame=0;invalidate();}
++ void start(){running=true;frame=0;invalidate();}
++ void stop(){running=false;invalidate();}
++ void toggle(){if(running)stop();else start();}
++ @Override protected void onDetachedFromWindow(){running=false;super.onDetachedFromWindow();}
++ @Override protected void onDraw(Canvas c){super.onDraw(c);if(bitmap==null)return;int cols=Math.max(1,bitmap.getWidth()/frameWidth),capacity=cols*Math.max(1,bitmap.getHeight()/frameHeight),safeCount=Math.max(1,Math.min(frameCount,capacity));frame%=safeCount;int sx=(frame%cols)*frameWidth,sy=(frame/cols)*frameHeight;if(sx+frameWidth>bitmap.getWidth()||sy+frameHeight>bitmap.getHeight())return;float scale=Math.min((getWidth()-20f)/frameWidth,(getHeight()-20f)/frameHeight);float w=frameWidth*scale,h=frameHeight*scale,l=(getWidth()-w)/2,t=(getHeight()-h)/2;paint.setColor(Color.WHITE);c.drawBitmap(bitmap,new Rect(sx,sy,sx+frameWidth,sy+frameHeight),new RectF(l,t,l+w,t+h),paint);paint.setColor(Color.WHITE);paint.setTextSize(12*getResources().getDisplayMetrics().density);c.drawText((frame+1)+" / "+safeCount,8,getHeight()-8,paint);if(running){frame=(frame+1)%safeCount;postInvalidateDelayed(frameMs);}}
++}
+diff --git a/src/com/dragon9x/gamestudio/GameProject.java b/src/com/dragon9x/gamestudio/GameProject.java
+index 14f863b..c629e55 100644
+--- a/src/com/dragon9x/gamestudio/GameProject.java
++++ b/src/com/dragon9x/gamestudio/GameProject.java
+@@ -10,9 +10,12 @@ final class GameProject {
+  int maxHp=100,maxMp=100,speed=160,gravity=900,flyCost=5,attackDamage=20,attackRange=95,attackCooldown=450,enemyHp=60,enemyDamage=5;
+  byte[] tiles,solid;
+  ArrayList<Skill> skills=new ArrayList<>();int activeSkillId=1;
++ ArrayList<SkillEffect> effects=new ArrayList<>();
+  ArrayList<GameModule> modules=new ArrayList<>();
+  GameProject(){resizeMap(width,height);skills.add(new Skill());}
+  Skill activeSkill(){for(Skill s:skills)if(s.id==activeSkillId)return s;return skills.get(0);}
++ SkillEffect effectById(int id){for(SkillEffect e:effects)if(e.id==id)return e;return null;}
++ SkillEffect activeEffect(){return effectById(activeSkill().effectId);}
+  int columns(){return width/16;}int rows(){return height/16;}
+  void resizeMap(int w,int h){if(w<320||w>4096||h<240||h>4096||w%16!=0||h%16!=0)throw new IllegalArgumentException("Map phải chia hết cho 16; rộng 320–4096, cao 240–4096");byte[] t=new byte[w/16*h/16],s=new byte[t.length];if(tiles!=null&&solid!=null){int cols=Math.min(columns(),w/16),rows=Math.min(rows(),h/16);for(int y=0;y<rows;y++){System.arraycopy(tiles,y*columns(),t,y*(w/16),cols);System.arraycopy(solid,y*columns(),s,y*(w/16),cols);}}width=w;height=h;tiles=t;solid=s;}
+  int tileAt(int x,int y){if(x<0||y<0||x>=width||y>=height)return -1;return (y/16)*columns()+x/16;}
+@@ -25,15 +28,17 @@ final class GameProject {
+   p.tiles=null;p.solid=null;p.resizeMap(p.width,p.height);String tiles64=j.optString("tiles","");String solid64=j.optString("solid","");if(!tiles64.isEmpty()||!solid64.isEmpty()){byte[] t=android.util.Base64.decode(tiles64,android.util.Base64.DEFAULT),s=android.util.Base64.decode(solid64,android.util.Base64.DEFAULT);if(t.length!=p.tiles.length||s.length!=p.solid.length)throw new IllegalArgumentException("Dữ liệu tile không khớp kích thước map");p.tiles=t;p.solid=s;for(byte b:s)if(b!=0&&b!=1)throw new IllegalArgumentException("Ô cản không hợp lệ");}
+   if(p.mode.equals("2D")&&(p.joystickX>400||p.joystickY>240||p.attackX>400||p.attackY>240)){p.joystickX=50;p.joystickY=190;p.attackX=350;p.attackY=190;}
+   JSONArray skillData=j.optJSONArray("skills");if(skillData!=null){p.skills.clear();if(skillData.length()>100)throw new IllegalArgumentException("Tối đa 100 chiêu thức");for(int i=0;i<skillData.length();i++){JSONObject entry=skillData.optJSONObject(i);if(entry==null)throw new IllegalArgumentException("Skill không hợp lệ");p.skills.add(Skill.parse(entry));}}else{p.skills.get(0).damage=p.attackDamage;p.skills.get(0).range=p.attackRange;p.skills.get(0).cooldown=p.attackCooldown;}p.activeSkillId=j.optInt("activeSkillId",1);
++  JSONArray effectData=j.optJSONArray("effects");if(effectData!=null){if(effectData.length()>100)throw new IllegalArgumentException("Tối đa 100 hiệu ứng skill");for(int i=0;i<effectData.length();i++){JSONObject entry=effectData.optJSONObject(i);if(entry==null)throw new IllegalArgumentException("Hiệu ứng skill không hợp lệ");p.effects.add(SkillEffect.parse(entry));}}
+   JSONArray moduleData=j.optJSONArray("modules");if(moduleData!=null){if(moduleData.length()>40)throw new IllegalArgumentException("Tối đa 40 class game");for(int i=0;i<moduleData.length();i++){JSONObject entry=moduleData.optJSONObject(i);if(entry==null)throw new IllegalArgumentException("Class game không hợp lệ");p.modules.add(GameModule.parse(entry));}}
+   p.validate();return p;
+  }
+- JSONObject json()throws JSONException {JSONObject j=new JSONObject();j.put("format",5);j.put("mode",mode);j.put("name",name);j.put("movement",movement);j.put("attackMode",attackMode);j.put("rules",rules);j.put("width",width);j.put("height",height);j.put("playerX",playerX);j.put("playerY",playerY);j.put("enemyX",enemyX);j.put("enemyY",enemyY);j.put("joystickX",joystickX);j.put("joystickY",joystickY);j.put("attackX",attackX);j.put("attackY",attackY);j.put("maxHp",maxHp);j.put("maxMp",maxMp);j.put("speed",speed);j.put("gravity",gravity);j.put("flyCost",flyCost);j.put("attackDamage",attackDamage);j.put("attackRange",attackRange);j.put("attackCooldown",attackCooldown);j.put("enemyHp",enemyHp);j.put("enemyDamage",enemyDamage);j.put("activeSkillId",activeSkillId);JSONArray list=new JSONArray();for(Skill s:skills)list.put(s.json());j.put("skills",list);JSONArray files=new JSONArray();for(GameModule m:modules)files.put(m.json());j.put("modules",files);if(tiles!=null){j.put("tiles",android.util.Base64.encodeToString(tiles,android.util.Base64.NO_WRAP));j.put("solid",android.util.Base64.encodeToString(solid,android.util.Base64.NO_WRAP));}return j;}
++ JSONObject json()throws JSONException {JSONObject j=new JSONObject();j.put("format",6);j.put("mode",mode);j.put("name",name);j.put("movement",movement);j.put("attackMode",attackMode);j.put("rules",rules);j.put("width",width);j.put("height",height);j.put("playerX",playerX);j.put("playerY",playerY);j.put("enemyX",enemyX);j.put("enemyY",enemyY);j.put("joystickX",joystickX);j.put("joystickY",joystickY);j.put("attackX",attackX);j.put("attackY",attackY);j.put("maxHp",maxHp);j.put("maxMp",maxMp);j.put("speed",speed);j.put("gravity",gravity);j.put("flyCost",flyCost);j.put("attackDamage",attackDamage);j.put("attackRange",attackRange);j.put("attackCooldown",attackCooldown);j.put("enemyHp",enemyHp);j.put("enemyDamage",enemyDamage);j.put("activeSkillId",activeSkillId);JSONArray list=new JSONArray();for(Skill s:skills)list.put(s.json());j.put("skills",list);JSONArray effectList=new JSONArray();for(SkillEffect e:effects)effectList.put(e.json());j.put("effects",effectList);JSONArray files=new JSONArray();for(GameModule m:modules)files.put(m.json());j.put("modules",files);if(tiles!=null){j.put("tiles",android.util.Base64.encodeToString(tiles,android.util.Base64.NO_WRAP));j.put("solid",android.util.Base64.encodeToString(solid,android.util.Base64.NO_WRAP));}return j;}
+  void validate(){
+   if(name==null||name.trim().isEmpty()||name.length()>80)throw new IllegalArgumentException("Tên game phải có 1–80 ký tự");
+   if(width<320||width>4096||height<240||height>4096||width%16!=0||height%16!=0)throw new IllegalArgumentException("Map phải chia hết cho 16; rộng 320–4096, cao 240–4096");
+   if(!mode.equals("2D")&&!mode.equals("2.5D"))throw new IllegalArgumentException("Loại game không hợp lệ");
+-  if(skills.isEmpty()||skills.size()>100)throw new IllegalArgumentException("Cần 1–100 chiêu thức");Set<Integer> ids=new HashSet<>();boolean found=false;for(Skill skill:skills){skill.validate();if(!ids.add(skill.id))throw new IllegalArgumentException("ID skill bị trùng");if(skill.id==activeSkillId)found=true;}if(!found)throw new IllegalArgumentException("Skill đang test không tồn tại");
++  if(effects.size()>100)throw new IllegalArgumentException("Tối đa 100 hiệu ứng skill");Set<Integer> effectIds=new HashSet<>();for(SkillEffect effect:effects){effect.validate();if(!effectIds.add(effect.id))throw new IllegalArgumentException("ID hiệu ứng bị trùng");}
++  if(skills.isEmpty()||skills.size()>100)throw new IllegalArgumentException("Cần 1–100 chiêu thức");Set<Integer> ids=new HashSet<>();boolean found=false;for(Skill skill:skills){skill.validate();if(!ids.add(skill.id))throw new IllegalArgumentException("ID skill bị trùng");if(skill.effectId!=0&&!effectIds.contains(skill.effectId))throw new IllegalArgumentException("Skill "+skill.name+" đang gán hiệu ứng không tồn tại: "+skill.effectId);if(skill.id==activeSkillId)found=true;}if(!found)throw new IllegalArgumentException("Skill đang test không tồn tại");
+   if(modules.size()>40)throw new IllegalArgumentException("Tối đa 40 class game");Set<String> names=new HashSet<>();for(GameModule module:modules){module.validate();if(!names.add(module.name))throw new IllegalArgumentException("Tên class bị trùng: "+module.name);}
+   if(mode.equals("2D")&&(tiles==null||solid==null||tiles.length!=columns()*rows()||solid.length!=tiles.length))throw new IllegalArgumentException("Tile map thiếu hoặc sai kích thước");
+   if(playerX<0||playerX>width||enemyX<0||enemyX>width||playerY<0||playerY>height||enemyY<0||enemyY>height||joystickX<0||joystickX>width||joystickY<0||joystickY>height||attackX<0||attackX>width||attackY<0||attackY>height)throw new IllegalArgumentException("Vị trí nhân vật/quái/nút điều khiển vượt map");
+diff --git a/src/com/dragon9x/gamestudio/ImageCropView.java b/src/com/dragon9x/gamestudio/ImageCropView.java
+new file mode 100644
+index 0000000..24b698f
+--- /dev/null
++++ b/src/com/dragon9x/gamestudio/ImageCropView.java
+@@ -0,0 +1,19 @@
++package com.dragon9x.gamestudio;
++
++import android.content.Context;
++import android.graphics.*;
++import android.view.*;
++
++/** Free-pixel crop selector used by the skill/effect designer. */
++final class ImageCropView extends View {
++ final Paint paint=new Paint(Paint.ANTI_ALIAS_FLAG);Bitmap image;float scale,left,top,zoom=1,downX,downY;int cropX,cropY,cropW,cropH;boolean dragging;
++ ImageCropView(Context c,Bitmap b){super(c);paint.setFilterBitmap(false);setBackgroundColor(0xff1c2834);setBitmap(b);}
++ void setBitmap(Bitmap b){image=b;cropX=0;cropY=0;cropW=b==null?1:b.getWidth();cropH=b==null?1:b.getHeight();zoom=1;invalidate();}
++ void resetCrop(){if(image!=null){cropX=0;cropY=0;cropW=image.getWidth();cropH=image.getHeight();invalidate();}}
++ void zoom(float f){zoom=Math.max(0.5f,Math.min(8f,zoom*f));invalidate();}
++ int px(float x){return image==null?0:Math.max(0,Math.min(image.getWidth()-1,(int)((x-left)/scale)));}
++ int py(float y){return image==null?0:Math.max(0,Math.min(image.getHeight()-1,(int)((y-top)/scale)));}
++ Bitmap crop(){if(image==null)throw new IllegalStateException("Chưa có ảnh");int w=Math.max(1,Math.min(cropW,image.getWidth()-cropX)),h=Math.max(1,Math.min(cropH,image.getHeight()-cropY));return Bitmap.createBitmap(image,cropX,cropY,w,h);}
++ @Override protected void onDraw(Canvas c){super.onDraw(c);if(image==null)return;float fit=Math.min((getWidth()-16f)/image.getWidth(),(getHeight()-16f)/image.getHeight());scale=Math.max(0.01f,fit*zoom);left=(getWidth()-image.getWidth()*scale)/2;top=(getHeight()-image.getHeight()*scale)/2;paint.setColor(Color.WHITE);c.drawBitmap(image,null,new RectF(left,top,left+image.getWidth()*scale,top+image.getHeight()*scale),paint);paint.setColor(0x55ffd038);c.drawRect(left+cropX*scale,top+cropY*scale,left+(cropX+cropW)*scale,top+(cropY+cropH)*scale,paint);paint.setStyle(Paint.Style.STROKE);paint.setStrokeWidth(3);paint.setColor(Color.YELLOW);c.drawRect(left+cropX*scale,top+cropY*scale,left+(cropX+cropW)*scale,top+(cropY+cropH)*scale,paint);paint.setStyle(Paint.Style.FILL);}
++ @Override public boolean onTouchEvent(MotionEvent e){if(image==null||scale<=0)return true;int a=e.getActionMasked();if(a==MotionEvent.ACTION_DOWN){downX=e.getX();downY=e.getY();cropX=px(downX);cropY=py(downY);cropW=cropH=1;dragging=true;invalidate();return true;}if((a==MotionEvent.ACTION_MOVE||a==MotionEvent.ACTION_UP)&&dragging){int x=px(e.getX()),y=py(e.getY()),sx=px(downX),sy=py(downY);cropX=Math.min(sx,x);cropY=Math.min(sy,y);cropW=Math.max(1,Math.abs(x-sx)+1);cropH=Math.max(1,Math.abs(y-sy)+1);invalidate();if(a==MotionEvent.ACTION_UP)dragging=false;return true;}return true;}
++}
+diff --git a/src/com/dragon9x/gamestudio/ProjectStore.java b/src/com/dragon9x/gamestudio/ProjectStore.java
+index fef6add..8f1a4f1 100644
+--- a/src/com/dragon9x/gamestudio/ProjectStore.java
++++ b/src/com/dragon9x/gamestudio/ProjectStore.java
+@@ -7,43 +7,36 @@ import java.nio.charset.StandardCharsets;
+ import java.util.*;
+ import java.util.zip.*;
+ 
+-/** Local project files; imports never accept arbitrary paths or executable code. */
++/** Local project files. Version 0.6 adds a separate tile bank and reusable effect files. */
+ final class ProjectStore {
+- private final File dir;static final String[] ASSETS={"background.png","player.png","enemy.png","tiles.png","effects.png"};
++ private final File dir;static final String[] ASSETS={"background.png","player.png","enemy.png","tiles.png","tile-bank.png","effects.png"};
+  ProjectStore(Context context){dir=new File(context.getFilesDir(),"game-project");dir.mkdirs();recoverImport();}
+- void recoverImport(){File stage=new File(dir,"import-stage");if(!stage.isDirectory())return;String[] targets={"project.json","background.png","player.png","enemy.png","tiles.png","effects.png"};if(new File(stage,"installing").exists())for(String name:targets){File old=new File(stage,"old-"+name),incoming=new File(stage,"new-"+name),touched=new File(stage,"touched-"+name),current=new File(dir,name);if(old.exists()){current.delete();old.renameTo(current);}else if(touched.exists()&&!incoming.exists())current.delete();}File[] parts=stage.listFiles();if(parts!=null)for(File part:parts)part.delete();stage.delete();}
++ void recoverImport(){File stage=new File(dir,"import-stage");if(!stage.isDirectory())return;deleteTree(stage);}
+  boolean hasProject(){return new File(dir,"project.json").isFile();}
+  boolean hasAsset(String name){return Arrays.asList(ASSETS).contains(name)&&new File(dir,name).isFile();}
+  GameProject load(){try{GameProject project=GameProject.fromJson(new String(read(new File(dir,"project.json"),1024*1024),StandardCharsets.UTF_8));try{syncModules(project);}catch(IOException ignored){}return project;}catch(Exception e){return new GameProject();}}
+- void save(GameProject project)throws Exception {project.validate();byte[] data=project.json().toString(2).getBytes(StandardCharsets.UTF_8);File temp=new File(dir,"project.tmp");write(temp,data);if(!temp.renameTo(new File(dir,"project.json")))throw new IOException("Không lưu được dự án");syncModules(project);}
+- void syncModules(GameProject project)throws IOException{File folder=new File(dir,"src/game");if(!folder.exists()&&!folder.mkdirs())throw new IOException("Không tạo được thư mục class game");HashSet<String> expected=new HashSet<>();for(GameModule module:project.modules){String file=module.name+".gsc";expected.add(file);File target=new File(folder,file),temp=new File(folder,file+".tmp");write(temp,module.source.getBytes(StandardCharsets.UTF_8));if(!temp.renameTo(target))throw new IOException("Không lưu được "+file);}File[] all=folder.listFiles();if(all!=null)for(File file:all)if(file.getName().endsWith(".gsc")&&!expected.contains(file.getName()))file.delete();}
++ void save(GameProject project)throws Exception {project.validate();byte[] data=project.json().toString(2).getBytes(StandardCharsets.UTF_8);File temp=new File(dir,"project.tmp");write(temp,data);File target=new File(dir,"project.json");if(target.exists()&&!target.delete())throw new IOException("Không thay được project.json");if(!temp.renameTo(target))throw new IOException("Không lưu được dự án");syncModules(project);}
++ void syncModules(GameProject project)throws IOException{File folder=new File(dir,"src/game");if(!folder.exists()&&!folder.mkdirs())throw new IOException("Không tạo được thư mục class game");HashSet<String> expected=new HashSet<>();for(GameModule module:project.modules){String file=module.name+".gsc";expected.add(file);File target=new File(folder,file),temp=new File(folder,file+".tmp");write(temp,module.source.getBytes(StandardCharsets.UTF_8));if(target.exists())target.delete();if(!temp.renameTo(target))throw new IOException("Không lưu được "+file);}File[] all=folder.listFiles();if(all!=null)for(File file:all)if(file.getName().endsWith(".gsc")&&!expected.contains(file.getName()))file.delete();}
+  static byte[] read(File file,int limit)throws IOException{try(InputStream in=new FileInputStream(file)){return readStream(in,limit);}}
+  static byte[] readStream(InputStream in,int limit)throws IOException{ByteArrayOutputStream out=new ByteArrayOutputStream();byte[] chunk=new byte[8192];for(int n;(n=in.read(chunk))!=-1;){out.write(chunk,0,n);if(out.size()>limit)throw new IOException("Tệp vượt giới hạn "+limit+" byte");}return out.toByteArray();}
+- static void write(File f,byte[] data)throws IOException{try(FileOutputStream out=new FileOutputStream(f)){out.write(data);out.getFD().sync();}}
++ static void write(File f,byte[] data)throws IOException{File parent=f.getParentFile();if(parent!=null&&!parent.exists()&&!parent.mkdirs())throw new IOException("Không tạo được thư mục "+parent.getName());try(FileOutputStream out=new FileOutputStream(f)){out.write(data);out.getFD().sync();}}
+  Bitmap bitmap(String name){try{byte[] data=read(new File(dir,name),8*1024*1024);return BitmapFactory.decodeByteArray(data,0,data.length);}catch(Exception e){return null;}}
+- void image(String name,byte[] data)throws Exception{if(!Arrays.asList(ASSETS).contains(name))throw new IOException("Tên ảnh không hợp lệ");if(data.length>8*1024*1024)throw new IOException("PNG vượt 8 MB");
+-  BitmapFactory.Options bounds=new BitmapFactory.Options();bounds.inJustDecodeBounds=true;BitmapFactory.decodeByteArray(data,0,data.length,bounds);
+-  if(bounds.outWidth<1||bounds.outHeight<1||bounds.outWidth>4096||bounds.outHeight>4096||(long)bounds.outWidth*bounds.outHeight>8000000)throw new IOException("Ảnh phải là PNG hợp lệ, tối đa 8 triệu pixel");
+-  if((name.equals("tiles.png")||name.equals("effects.png"))&&(bounds.outWidth%16!=0||bounds.outHeight%16!=0||(long)bounds.outWidth*bounds.outHeight>65536))throw new IOException("Atlas tile phải chia hết cho 16×16 pixel");
+-  if(data.length<8||data[0]!=(byte)137||data[1]!=80||data[2]!=78||data[3]!=71)throw new IOException("Chỉ nhận ảnh PNG");
+-  File tmp=new File(dir,name+".tmp");write(tmp,data);if(!tmp.renameTo(new File(dir,name)))throw new IOException("Không lưu được ảnh");
+- }
+- void exportTo(OutputStream stream,GameProject project)throws Exception{save(project);ZipOutputStream zip=new ZipOutputStream(stream);try{add(zip,"project.json",read(new File(dir,"project.json"),1024*1024));for(GameModule module:project.modules)add(zip,module.path(),module.source.getBytes(StandardCharsets.UTF_8));for(String n:ASSETS){File f=new File(dir,n);if(f.isFile())add(zip,n,read(f,8*1024*1024));}zip.finish();}finally{zip.close();}}
++ void image(String name,byte[] data)throws Exception{if(!Arrays.asList(ASSETS).contains(name))throw new IOException("Tên ảnh không hợp lệ");validatePng(data,name,true);File tmp=new File(dir,name+".tmp");write(tmp,data);File target=new File(dir,name);if(target.exists()&&!target.delete())throw new IOException("Không thay được ảnh cũ");if(!tmp.renameTo(target))throw new IOException("Không lưu được ảnh");}
++ private static void validatePng(byte[] data,String name,boolean atlasRules)throws IOException{if(data.length>8*1024*1024)throw new IOException("PNG vượt 8 MB");if(data.length<8||data[0]!=(byte)137||data[1]!=80||data[2]!=78||data[3]!=71)throw new IOException("Chỉ nhận ảnh PNG");BitmapFactory.Options b=new BitmapFactory.Options();b.inJustDecodeBounds=true;BitmapFactory.decodeByteArray(data,0,data.length,b);if(b.outWidth<1||b.outHeight<1||b.outWidth>4096||b.outHeight>4096||(long)b.outWidth*b.outHeight>8000000)throw new IOException("Ảnh PNG không hợp lệ hoặc quá lớn");if(atlasRules&&(name.equals("tiles.png")||name.equals("tile-bank.png"))&&(b.outWidth%16!=0||b.outHeight%16!=0||(long)b.outWidth*b.outHeight>1048576))throw new IOException("Kho tile phải chia hết cho 16×16 pixel");}
++ Bitmap effectBitmap(String fileName){if(fileName==null||!fileName.matches("effects/eff_[0-9]{1,5}\\.png"))return null;try{byte[] data=read(new File(dir,fileName),8*1024*1024);return BitmapFactory.decodeByteArray(data,0,data.length);}catch(Exception e){return null;}}
++ boolean hasEffect(String fileName){return fileName!=null&&fileName.matches("effects/eff_[0-9]{1,5}\\.png")&&new File(dir,fileName).isFile();}
++ void saveEffect(SkillEffect effect,byte[] data)throws Exception{effect.validate();validatePng(data,effect.fileName,false);BitmapFactory.Options b=new BitmapFactory.Options();b.inJustDecodeBounds=true;BitmapFactory.decodeByteArray(data,0,data.length,b);if(b.outWidth%effect.frameWidth!=0||b.outHeight%effect.frameHeight!=0)throw new IOException("Ảnh hiệu ứng phải chia đều theo kích thước frame "+effect.frameWidth+"×"+effect.frameHeight);int capacity=(b.outWidth/effect.frameWidth)*(b.outHeight/effect.frameHeight);if(effect.frameCount>capacity)throw new IOException("Số frame vượt ảnh: tối đa "+capacity);File target=new File(dir,effect.fileName),tmp=new File(dir,effect.fileName+".tmp");write(tmp,data);if(target.exists()&&!target.delete())throw new IOException("Không thay được hiệu ứng cũ");if(!tmp.renameTo(target))throw new IOException("Không lưu được hiệu ứng");}
++ void deleteEffect(SkillEffect effect){if(effect!=null&&effect.fileName.matches("effects/eff_[0-9]{1,5}\\.png"))new File(dir,effect.fileName).delete();}
++ void exportTo(OutputStream stream,GameProject project)throws Exception{save(project);ZipOutputStream zip=new ZipOutputStream(stream);try{add(zip,"project.json",read(new File(dir,"project.json"),1024*1024));for(GameModule module:project.modules)add(zip,module.path(),module.source.getBytes(StandardCharsets.UTF_8));for(String n:ASSETS){File f=new File(dir,n);if(f.isFile())add(zip,n,read(f,8*1024*1024));}for(SkillEffect effect:project.effects){File f=new File(dir,effect.fileName);if(f.isFile())add(zip,effect.fileName,read(f,8*1024*1024));}zip.finish();}finally{zip.close();}}
+  private static void add(ZipOutputStream zip,String name,byte[] data)throws IOException{zip.putNextEntry(new ZipEntry(name));zip.write(data);zip.closeEntry();}
+  GameProject importFrom(InputStream stream)throws Exception{
+-  HashMap<String,byte[]> entries=new HashMap<>();int total=0;try(ZipInputStream zip=new ZipInputStream(stream)){for(ZipEntry entry;(entry=zip.getNextEntry())!=null;){String name=entry.getName();if(!name.equals("project.json")&&!Arrays.asList(ASSETS).contains(name)&&!name.matches("src/game/[A-Za-z][A-Za-z0-9_]{0,39}\\.gsc")||entries.containsKey(name))throw new IOException("Dự án chứa mục không hợp lệ: "+name);byte[] data=readStream(zip,8*1024*1024);total+=data.length;if(total>25*1024*1024)throw new IOException("Dự án vượt 25 MB");entries.put(name,data);zip.closeEntry();}}
+-  if(!entries.containsKey("project.json"))throw new IOException("Thiếu project.json");if(entries.get("project.json").length>1024*1024)throw new IOException("project.json vượt 1 MB");GameProject next=GameProject.fromJson(new String(entries.get("project.json"),StandardCharsets.UTF_8));for(GameModule m:next.modules){byte[] raw=entries.get(m.path());if(raw!=null&&!Arrays.equals(raw,m.source.getBytes(StandardCharsets.UTF_8)))throw new IOException("Mã class trong ZIP khác project.json: "+m.path());}for(String name:entries.keySet())if(name.startsWith("src/game/")){boolean found=false;for(GameModule m:next.modules)if(m.path().equals(name))found=true;if(!found)throw new IOException("File class không có trong project.json: "+name);}
+-  for(String asset:ASSETS)if(entries.containsKey(asset)){byte[] data=entries.get(asset);BitmapFactory.Options b=new BitmapFactory.Options();b.inJustDecodeBounds=true;BitmapFactory.decodeByteArray(data,0,data.length,b);if(b.outWidth<1||b.outHeight<1||b.outWidth>4096||b.outHeight>4096||(long)b.outWidth*b.outHeight>8000000||data.length<8||data[0]!=(byte)137||((asset.equals("tiles.png")||asset.equals("effects.png"))&&(b.outWidth%16!=0||b.outHeight%16!=0||(long)b.outWidth*b.outHeight>65536)))throw new IOException("Ảnh dự án không hợp lệ: "+asset);}
+-  String[] targets={"project.json","background.png","player.png","enemy.png","tiles.png","effects.png"};File stage=new File(dir,"import-stage");if(!stage.exists()&&!stage.mkdir())throw new IOException("Không tạo được vùng nhập dự án");
+-  write(new File(stage,"new-project.json"),next.json().toString(2).getBytes(StandardCharsets.UTF_8));for(String asset:ASSETS)if(entries.containsKey(asset))write(new File(stage,"new-"+asset),entries.get(asset));
+-  write(new File(stage,"installing"),new byte[]{1});boolean[] backed=new boolean[targets.length],installed=new boolean[targets.length];
+-  try{for(int i=0;i<targets.length;i++){
+-    File current=new File(dir,targets[i]),backup=new File(stage,"old-"+targets[i]);if(backup.exists()&&!backup.delete())throw new IOException("Không dọn được bản tạm");
+-    if(current.exists()){if(!current.renameTo(backup))throw new IOException("Không sao lưu được "+targets[i]);backed[i]=true;}
+-    File incoming=new File(stage,"new-"+targets[i]);if(backed[i]||incoming.exists())write(new File(stage,"touched-"+targets[i]),new byte[]{1});if(incoming.exists()){if(!incoming.renameTo(current))throw new IOException("Không ghi được "+targets[i]);installed[i]=true;}
+-   }}catch(Exception failure){for(int i=targets.length-1;i>=0;i--){File current=new File(dir,targets[i]),backup=new File(stage,"old-"+targets[i]);if(installed[i])current.delete();if(backed[i])backup.renameTo(current);}throw failure;
+-  }finally{for(File f:stage.listFiles()==null?new File[0]:stage.listFiles())f.delete();stage.delete();}
+-  try{syncModules(next);}catch(IOException ignored){}return next;
++  HashMap<String,byte[]> entries=new HashMap<>();int total=0;try(ZipInputStream zip=new ZipInputStream(stream)){for(ZipEntry entry;(entry=zip.getNextEntry())!=null;){String name=entry.getName();boolean allowed=name.equals("project.json")||Arrays.asList(ASSETS).contains(name)||name.matches("src/game/[A-Za-z][A-Za-z0-9_]{0,39}\\.gsc")||name.matches("effects/eff_[0-9]{1,5}\\.png");if(entry.isDirectory()||!allowed||entries.containsKey(name))throw new IOException("Dự án chứa mục không hợp lệ: "+name);byte[] data=readStream(zip,8*1024*1024);total+=data.length;if(total>50*1024*1024)throw new IOException("Dự án vượt 50 MB");entries.put(name,data);zip.closeEntry();}}
++  if(!entries.containsKey("project.json"))throw new IOException("Thiếu project.json");GameProject next=GameProject.fromJson(new String(entries.get("project.json"),StandardCharsets.UTF_8));for(GameModule m:next.modules){byte[] raw=entries.get(m.path());if(raw!=null&&!Arrays.equals(raw,m.source.getBytes(StandardCharsets.UTF_8)))throw new IOException("Mã class trong ZIP khác project.json: "+m.path());}for(String name:entries.keySet())if(name.startsWith("src/game/")){boolean found=false;for(GameModule m:next.modules)if(m.path().equals(name))found=true;if(!found)throw new IOException("File class không có trong project.json: "+name);}
++  for(String asset:ASSETS)if(entries.containsKey(asset))validatePng(entries.get(asset),asset,true);for(SkillEffect e:next.effects){byte[] raw=entries.get(e.fileName);if(raw==null)throw new IOException("Thiếu file hiệu ứng: "+e.fileName);validatePng(raw,e.fileName,false);BitmapFactory.Options b=new BitmapFactory.Options();b.inJustDecodeBounds=true;BitmapFactory.decodeByteArray(raw,0,raw.length,b);if(b.outWidth%e.frameWidth!=0||b.outHeight%e.frameHeight!=0||e.frameCount>(b.outWidth/e.frameWidth)*(b.outHeight/e.frameHeight))throw new IOException("Frame hiệu ứng không khớp: "+e.name);}
++  File stage=new File(dir,"import-stage");deleteTree(stage);if(!stage.mkdirs())throw new IOException("Không tạo được vùng nhập dự án");String[] targets={"project.json","background.png","player.png","enemy.png","tiles.png","tile-bank.png","effects.png"};
++  try{write(new File(stage,"project.json"),next.json().toString(2).getBytes(StandardCharsets.UTF_8));for(String asset:ASSETS)if(entries.containsKey(asset))write(new File(stage,asset),entries.get(asset));File newEffects=new File(stage,"effects");for(SkillEffect e:next.effects)write(new File(newEffects,new File(e.fileName).getName()),entries.get(e.fileName));File old=new File(dir,"import-backup");deleteTree(old);if(!old.mkdirs())throw new IOException("Không tạo được vùng sao lưu");for(String target:targets){File cur=new File(dir,target);if(cur.exists()&&!cur.renameTo(new File(old,target)))throw new IOException("Không sao lưu được "+target);}File curEffects=new File(dir,"effects");if(curEffects.exists()&&!curEffects.renameTo(new File(old,"effects")))throw new IOException("Không sao lưu được kho effect");boolean ok=false;try{for(String target:targets){File incoming=new File(stage,target);if(incoming.exists()&&!incoming.renameTo(new File(dir,target)))throw new IOException("Không ghi được "+target);}if(newEffects.exists()&&!newEffects.renameTo(new File(dir,"effects")))throw new IOException("Không ghi được kho effect");ok=true;}finally{if(!ok){for(String target:targets){new File(dir,target).delete();File backup=new File(old,target);if(backup.exists())backup.renameTo(new File(dir,target));}deleteTree(new File(dir,"effects"));File backupEffects=new File(old,"effects");if(backupEffects.exists())backupEffects.renameTo(new File(dir,"effects"));}deleteTree(old);}}
++  finally{deleteTree(stage);}try{syncModules(next);}catch(IOException ignored){}return next;
+  }
+- void reset(GameProject p)throws Exception{for(String asset:ASSETS)new File(dir,asset).delete();save(p);}
++ void reset(GameProject p)throws Exception{for(String asset:ASSETS)new File(dir,asset).delete();deleteTree(new File(dir,"effects"));save(p);}
++ static void deleteTree(File f){if(f==null||!f.exists())return;if(f.isDirectory()){File[] parts=f.listFiles();if(parts!=null)for(File c:parts)deleteTree(c);}f.delete();}
+ }
+diff --git a/src/com/dragon9x/gamestudio/Skill.java b/src/com/dragon9x/gamestudio/Skill.java
+index 9f27df7..c551df3 100644
+--- a/src/com/dragon9x/gamestudio/Skill.java
++++ b/src/com/dragon9x/gamestudio/Skill.java
+@@ -2,13 +2,13 @@ package com.dragon9x.gamestudio;
+ 
+ import org.json.*;
+ 
+-/** Independent game skill, without JAR class or KPAH table dependencies. */
++/** Independent game skill. Visuals are assigned from the reusable SkillEffect library. */
+ final class Skill {
+- int id=1,damage=20,range=95,cooldown=450,firstFrame=0,frameCount=1,frameMs=80;
++ int id=1,damage=20,range=95,cooldown=450,firstFrame=0,frameCount=1,frameMs=80,effectId=0;
+  String name="Đòn cơ bản",faction="Chung";
+- JSONObject json()throws JSONException{JSONObject j=new JSONObject();j.put("id",id);j.put("name",name);j.put("faction",faction);j.put("damage",damage);j.put("range",range);j.put("cooldown",cooldown);j.put("firstFrame",firstFrame);j.put("frameCount",frameCount);j.put("frameMs",frameMs);return j;}
+- static Skill parse(JSONObject j){Skill s=new Skill();s.id=j.optInt("id",s.id);s.name=j.optString("name",s.name);s.faction=j.optString("faction",s.faction);s.damage=j.optInt("damage",s.damage);s.range=j.optInt("range",s.range);s.cooldown=j.optInt("cooldown",s.cooldown);s.firstFrame=j.optInt("firstFrame",0);s.frameCount=j.optInt("frameCount",1);s.frameMs=j.optInt("frameMs",80);s.validate();return s;}
+- static Skill parseUnchecked(Skill old){Skill s=new Skill();s.id=old.id;s.name=old.name;s.faction=old.faction;s.damage=old.damage;s.range=old.range;s.cooldown=old.cooldown;s.firstFrame=old.firstFrame;s.frameCount=old.frameCount;s.frameMs=old.frameMs;return s;}
+- void validate(){if(id<1||id>99999||name.trim().isEmpty()||name.length()>60||faction.trim().isEmpty()||faction.length()>40||damage<0||damage>10000||range<1||range>2048||cooldown<100||cooldown>30000||firstFrame<0||firstFrame>255||frameCount<1||frameCount>256||firstFrame+frameCount>256||frameMs<20||frameMs>2000)throw new IllegalArgumentException("Thông số skill/animation không hợp lệ");}
+- public String toString(){return id+" • "+name+" ["+faction+"] • sát thương "+damage+" • "+frameCount+" frame";}
++ JSONObject json()throws JSONException{JSONObject j=new JSONObject();j.put("id",id);j.put("name",name);j.put("faction",faction);j.put("damage",damage);j.put("range",range);j.put("cooldown",cooldown);j.put("firstFrame",firstFrame);j.put("frameCount",frameCount);j.put("frameMs",frameMs);j.put("effectId",effectId);return j;}
++ static Skill parse(JSONObject j){Skill s=new Skill();s.id=j.optInt("id",s.id);s.name=j.optString("name",s.name);s.faction=j.optString("faction",s.faction);s.damage=j.optInt("damage",s.damage);s.range=j.optInt("range",s.range);s.cooldown=j.optInt("cooldown",s.cooldown);s.firstFrame=j.optInt("firstFrame",0);s.frameCount=j.optInt("frameCount",1);s.frameMs=j.optInt("frameMs",80);s.effectId=j.optInt("effectId",0);s.validate();return s;}
++ static Skill parseUnchecked(Skill old){Skill s=new Skill();s.id=old.id;s.name=old.name;s.faction=old.faction;s.damage=old.damage;s.range=old.range;s.cooldown=old.cooldown;s.firstFrame=old.firstFrame;s.frameCount=old.frameCount;s.frameMs=old.frameMs;s.effectId=old.effectId;return s;}
++ void validate(){if(id<1||id>99999||name.trim().isEmpty()||name.length()>60||faction.trim().isEmpty()||faction.length()>40||damage<0||damage>1000000||range<1||range>4096||cooldown<50||cooldown>30000||firstFrame<0||firstFrame>4095||frameCount<1||frameCount>4096||frameMs<20||frameMs>5000||effectId<0||effectId>99999)throw new IllegalArgumentException("Thông số skill/animation không hợp lệ");}
++ public String toString(){return id+" • "+name+" ["+faction+"] • sát thương "+damage+(effectId>0?" • eff #"+effectId:"");}
+ }
+diff --git a/src/com/dragon9x/gamestudio/SkillEffect.java b/src/com/dragon9x/gamestudio/SkillEffect.java
+new file mode 100644
+index 0000000..8cf56f8
+--- /dev/null
++++ b/src/com/dragon9x/gamestudio/SkillEffect.java
+@@ -0,0 +1,14 @@
++package com.dragon9x.gamestudio;
++
++import org.json.*;
++
++/** One reusable visual effect made in the Skill Designer. Frames may be any pixel size. */
++final class SkillEffect {
++ int id=1,frameWidth=64,frameHeight=64,frameCount=1,frameMs=80;
++ String name="Hiệu ứng 1",fileName="effects/eff_1.png";
++ JSONObject json()throws JSONException{JSONObject j=new JSONObject();j.put("id",id);j.put("name",name);j.put("file",fileName);j.put("frameWidth",frameWidth);j.put("frameHeight",frameHeight);j.put("frameCount",frameCount);j.put("frameMs",frameMs);return j;}
++ static SkillEffect parse(JSONObject j){SkillEffect e=new SkillEffect();e.id=j.optInt("id",e.id);e.name=j.optString("name",e.name);e.fileName=j.optString("file","effects/eff_"+e.id+".png");e.frameWidth=j.optInt("frameWidth",e.frameWidth);e.frameHeight=j.optInt("frameHeight",e.frameHeight);e.frameCount=j.optInt("frameCount",e.frameCount);e.frameMs=j.optInt("frameMs",e.frameMs);e.validate();return e;}
++ static SkillEffect copy(SkillEffect old){SkillEffect e=new SkillEffect();e.id=old.id;e.name=old.name;e.fileName=old.fileName;e.frameWidth=old.frameWidth;e.frameHeight=old.frameHeight;e.frameCount=old.frameCount;e.frameMs=old.frameMs;return e;}
++ void validate(){if(id<1||id>99999||name==null||name.trim().isEmpty()||name.length()>60||!fileName.matches("effects/eff_[0-9]{1,5}\\.png")||frameWidth<1||frameWidth>2048||frameHeight<1||frameHeight>2048||frameCount<1||frameCount>1024||frameMs<20||frameMs>5000)throw new IllegalArgumentException("Thông số hiệu ứng không hợp lệ");}
++ public String toString(){return id+" • "+name+" • frame "+frameWidth+"×"+frameHeight+" • "+frameCount+" ảnh";}
++}
+diff --git a/src/com/dragon9x/gamestudio/StageView.java b/src/com/dragon9x/gamestudio/StageView.java
+index e4799ad..e67e86f 100644
+--- a/src/com/dragon9x/gamestudio/StageView.java
++++ b/src/com/dragon9x/gamestudio/StageView.java
+@@ -106,7 +106,7 @@ final class StageView extends View {
+   if(System.currentTimeMillis()<messageUntil){paint.setColor(Color.WHITE);paint.setTextSize(12);c.drawText(message,7,31,paint);}c.restore();if(playing)postInvalidateDelayed(33);
+  }
+  void drawFlatActor(Canvas c,Bitmap bitmap,float x,float y,int color){if(bitmap==null){paint.setColor(color);c.drawCircle(x,y,9,paint);}else{paint.setColor(Color.WHITE);float ratio=Math.min(24f/bitmap.getWidth(),24f/bitmap.getHeight());float w=bitmap.getWidth()*ratio,h=bitmap.getHeight()*ratio;c.drawBitmap(bitmap,null,new RectF(x-w/2,y-h/2,x+w/2,y+h/2),paint);}}
+- void drawEffect(Canvas c){if(!playing||lastAttack==0)return;Skill skill=project.activeSkill();long elapsed=System.currentTimeMillis()-lastAttack;if(elapsed<0||elapsed>skill.frameMs*(long)skill.frameCount)return;int frame=skill.firstFrame+(int)(elapsed/skill.frameMs);if(effectImage!=null&&effectImage.getWidth()%16==0&&effectImage.getHeight()%16==0){int columns=effectImage.getWidth()/16;if(frame<columns*(effectImage.getHeight()/16)){paint.setColor(Color.WHITE);c.drawBitmap(effectImage,new Rect((frame%columns)*16,(frame/columns)*16,(frame%columns+1)*16,(frame/columns+1)*16),new RectF(effectX-16,effectY-16,effectX+16,effectY+16),paint);return;}}paint.setColor(0x99ffc443);c.drawCircle(effectX,effectY,12,paint);}
++ void drawEffect(Canvas c){if(!playing||lastAttack==0)return;Skill skill=project.activeSkill();SkillEffect effect=project.effectById(skill.effectId);long elapsed=System.currentTimeMillis()-lastAttack;if(effect!=null&&effectImage!=null){long duration=skill.frameMs*(long)effect.frameCount;if(elapsed<0||elapsed>=duration)return;int frame=(int)(elapsed/skill.frameMs);int fw=effect.frameWidth,fh=effect.frameHeight,columns=effectImage.getWidth()/fw,rows=effectImage.getHeight()/fh;if(columns>0&&rows>0&&frame<Math.min(effect.frameCount,columns*rows)){int sx=(frame%columns)*fw,sy=(frame/columns)*fh;paint.setColor(Color.WHITE);c.drawBitmap(effectImage,new Rect(sx,sy,sx+fw,sy+fh),new RectF(effectX-fw/2f,effectY-fh/2f,effectX+fw/2f,effectY+fh/2f),paint);return;}}long legacyDuration=skill.frameMs*(long)skill.frameCount;if(elapsed<0||elapsed>=legacyDuration)return;int frame=skill.firstFrame+(int)(elapsed/skill.frameMs);if(effectImage!=null&&effectImage.getWidth()%16==0&&effectImage.getHeight()%16==0){int columns=effectImage.getWidth()/16;if(frame<columns*(effectImage.getHeight()/16)){paint.setColor(Color.WHITE);c.drawBitmap(effectImage,new Rect((frame%columns)*16,(frame/columns)*16,(frame%columns+1)*16,(frame/columns+1)*16),new RectF(effectX-16,effectY-16,effectX+16,effectY+16),paint);return;}}paint.setColor(0x99ffc443);c.drawCircle(effectX,effectY,12,paint);}
+  boolean touch2D(MotionEvent e){int action=e.getActionMasked();if(scale2D()<=0)return true;
+   if(!playing){if(action==MotionEvent.ACTION_DOWN)lastPaintIndex=-1;if(action==MotionEvent.ACTION_DOWN||action==MotionEvent.ACTION_MOVE||action==MotionEvent.ACTION_UP){float sx=screenX(e.getX()),sy=screenY(e.getY());if(sx>=0&&sx<400&&sy>=0&&sy<240){int x=(int)(sx+cameraX),y=(int)(sy+cameraY),index=project.tileAt(x,y);if(index>=0){if(editTool==0&&action==MotionEvent.ACTION_UP){project.playerX=x;project.playerY=y;}else if(editTool==1&&action==MotionEvent.ACTION_UP){project.enemyX=x;project.enemyY=y;}else if(editTool==2&&action==MotionEvent.ACTION_UP){project.joystickX=(int)sx;project.joystickY=(int)sy;}else if(editTool==3&&action==MotionEvent.ACTION_UP){project.attackX=(int)sx;project.attackY=(int)sy;}else if(editTool>=4&&index!=lastPaintIndex){if(editTool==4){int[] ids=brushIds==null?new int[]{tileBrush}:brushIds;int cols=Math.max(1,brushColumns),startX=x/16,startY=y/16;for(int n=0;n<ids.length;n++){int col=startX+n%cols,row=startY+n/cols;if(col<project.columns()&&row<project.rows())project.tiles[row*project.columns()+col]=(byte)ids[n];}}if(editTool==5)project.solid[index]=1;if(editTool==6){project.solid[index]=0;project.tiles[index]=0;}lastPaintIndex=index;}invalidate();}}if(action==MotionEvent.ACTION_UP&&onChange!=null)onChange.run();}return true;}
+   if(action==MotionEvent.ACTION_UP||action==MotionEvent.ACTION_CANCEL){axisX=axisY=0;invalidate();return true;}if(action==MotionEvent.ACTION_POINTER_UP){axisX=axisY=0;for(int i=0;i<e.getPointerCount();i++){if(i==e.getActionIndex())continue;float x=screenX(e.getX(i)),y=screenY(e.getY(i));if(Math.hypot(x-project.joystickX,y-project.joystickY)<48){axisX=(x-project.joystickX)/30f;axisY=(y-project.joystickY)/30f;}}return true;}
+diff --git a/src/com/dragon9x/gamestudio/TilePaletteView.java b/src/com/dragon9x/gamestudio/TilePaletteView.java
+new file mode 100644
+index 0000000..f199845
+--- /dev/null
++++ b/src/com/dragon9x/gamestudio/TilePaletteView.java
+@@ -0,0 +1,20 @@
++package com.dragon9x.gamestudio;
++
++import android.content.Context;
++import android.graphics.*;
++import android.view.*;
++
++/** Scrollable tile bank shown beside the map canvas. */
++final class TilePaletteView extends View {
++ interface Listener{void onTileSelected(int id);}
++ final Paint paint=new Paint(Paint.ANTI_ALIAS_FLAG);Bitmap atlas;Listener listener;int selected=0;float density,cell,scroll,downY,lastY;boolean moved;
++ TilePaletteView(Context c){super(c);density=getResources().getDisplayMetrics().density;cell=44*density;paint.setFilterBitmap(false);setBackgroundColor(0xff24313a);}
++ void setListener(Listener l){listener=l;}
++ void setAtlas(Bitmap b){atlas=b;selected=Math.max(0,Math.min(selected,count()-1));scroll=0;invalidate();}
++ void setSelected(int id){if(id>=0&&id<count()){selected=id;invalidate();}}
++ int count(){return atlas==null?0:(atlas.getWidth()/16)*(atlas.getHeight()/16);}
++ int columns(){return Math.max(1,(int)(getWidth()/cell));}
++ float maxScroll(){int n=count(),cols=columns(),rows=(n+cols-1)/cols;return Math.max(0,rows*cell-getHeight());}
++ @Override protected void onDraw(Canvas c){super.onDraw(c);if(atlas==null||count()==0){paint.setColor(Color.LTGRAY);paint.setTextSize(12*density);c.drawText("Kho tile trống",8*density,24*density,paint);return;}int atlasCols=atlas.getWidth()/16,cols=columns(),n=count();paint.setTextSize(9*density);for(int id=0;id<n;id++){int col=id%cols,row=id/cols;float l=col*cell,t=row*cell-scroll;if(t+cell<0||t>getHeight())continue;Rect src=new Rect((id%atlasCols)*16,(id/atlasCols)*16,(id%atlasCols+1)*16,(id/atlasCols+1)*16);RectF dst=new RectF(l+4*density,t+4*density,l+cell-4*density,t+cell-4*density);paint.setColor(0xffd9e3e8);c.drawRect(dst,paint);paint.setColor(Color.WHITE);c.drawBitmap(atlas,src,dst,paint);if(id==selected){paint.setStyle(Paint.Style.STROKE);paint.setStrokeWidth(3*density);paint.setColor(0xffffc928);c.drawRect(dst,paint);paint.setStyle(Paint.Style.FILL);}paint.setColor(0xdd000000);c.drawRect(l+2*density,t+2*density,l+22*density,t+14*density,paint);paint.setColor(Color.WHITE);c.drawText(""+id,l+4*density,t+12*density,paint);}}
++ @Override public boolean onTouchEvent(MotionEvent e){int a=e.getActionMasked();if(a==MotionEvent.ACTION_DOWN){downY=lastY=e.getY();moved=false;return true;}if(a==MotionEvent.ACTION_MOVE){float dy=e.getY()-lastY;if(Math.abs(e.getY()-downY)>6*density)moved=true;scroll=Math.max(0,Math.min(maxScroll(),scroll-dy));lastY=e.getY();invalidate();return true;}if(a==MotionEvent.ACTION_UP&&!moved&&count()>0){int col=(int)(e.getX()/cell),row=(int)((e.getY()+scroll)/cell),id=row*columns()+col;if(id>=0&&id<count()){selected=id;if(listener!=null)listener.onTileSelected(id);invalidate();}return true;}return true;}
++}
