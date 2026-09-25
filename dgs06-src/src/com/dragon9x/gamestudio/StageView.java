@@ -998,3 +998,56 @@ project.joystickX=x;
 project.joystickY=y;
 }
 else{
+project.attackX=x;
+project.attackY=y;
+}
+if(onChange!=null)onChange.run();
+invalidate();
+}
+return true;
+}
+
+  if(action==MotionEvent.ACTION_UP||action==MotionEvent.ACTION_CANCEL){
+axisX=axisY=0;
+invalidate();
+return true;
+}
+
+  if(action==MotionEvent.ACTION_POINTER_UP){
+axisX=axisY=0;
+for(int i=0;
+i<e.getPointerCount();
+i++){
+if(i==e.getActionIndex())continue;
+float x=worldX(e.getX(i)),y=worldY(e.getY(i));
+if(Math.hypot(x-project.joystickX,y-project.joystickY)<100){
+axisX=(x-project.joystickX)/66f;
+axisY=(y-project.joystickY)/66f;
+}
+}
+invalidate();
+return true;
+}
+
+  if(action==MotionEvent.ACTION_DOWN||action==MotionEvent.ACTION_POINTER_DOWN||action==MotionEvent.ACTION_MOVE){
+boolean move=false;
+for(int i=0;
+i<e.getPointerCount();
+i++){
+float x=worldX(e.getX(i)),y=worldY(e.getY(i));
+if(Math.hypot(x-project.joystickX,y-project.joystickY)<100){
+axisX=(x-project.joystickX)/66f;
+axisY=(y-project.joystickY)/66f;
+move=true;
+}
+if(Math.hypot(x-project.attackX,y-project.attackY)<72&&(action!=MotionEvent.ACTION_MOVE||project.attackMode.equals("Giữ")))attack();
+}
+if(!move)axisX=axisY=0;
+invalidate();
+return true;
+}
+return true;
+
+ }
+
+}
